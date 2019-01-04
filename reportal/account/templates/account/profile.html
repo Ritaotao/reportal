@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+        <h2>Update your information</h2>
+        <hr/>   
+        <form method="POST" action=''>
+            {% csrf_token %}
+            {% crispy user_form %}
+            {% crispy profile_form %}  
+            <a href="{% url 'porter:home' %}" class="btn btn-info">&laquo; Back</a>
+            <input class="btn btn-primary" type="submit" value="Update">
+        </form>       
+{% endblock content %}

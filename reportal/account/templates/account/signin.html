@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <form method="POST" action='' enctype='multipart/form-data'>
+        <h2>{{ title }}</h2>
+        <hr/>
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+
+{% endblock content %}
