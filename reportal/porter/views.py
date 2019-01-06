@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect #, get_object_or_404
 from django.urls import reverse
 from django.views import View
-from .models import ReportSet, Template, Submission
-from .forms import ReportSetForm, TemplateForm
+from .models import ReportSet, Template, Submission, Field
+from .forms import ReportSetForm, TemplateForm, FieldForm
 
 import random
 
@@ -33,6 +33,7 @@ class ReportSetView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
+            return redirect('porter:reportset')
         return render(request, self.template_name, {'query_list': self.query_list, 'form': form})
 
 
@@ -41,23 +42,43 @@ class TemplateView(View):
     template_name = "porter/template.html"
     
     def get(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
         form = self.form_class()
-        query_list = Template.objects.filter(report_set__id=self.kwargs['pk']).all()
-        return render(request, self.template_name, {'query_list': query_list, 'form': form})
+        query_list = Template.objects.filter(report_set__id=pk).all()
+        return render(request, self.template_name, {'query_list': query_list, 'form': form, 'pk': pk})
 
     def post(self, request, *args, **kwargs):
-        reportset_id = self.kwargs['pk']
+        pk = self.kwargs['pk']
         form = self.form_class(request.POST)
         if form.is_valid():
             new = form.save(commit=False)
             new.uid = genUid()
-            new.report_set_id = reportset_id
+            new.report_set_id = pk
             new.save()
-        query_list = Template.objects.filter(report_set__id=reportset_id).all()
-        return render(request, self.template_name, {'query_list': query_list, 'form': form})
+            return redirect('porter:template', pk=pk)
+        query_list = Template.objects.filter(report_set__id=pk).all()
+        return render(request, self.template_name, {'query_list': query_list, 'form': form, 'pk': pk})
 
 
 class FieldView(View):
-    pass
+    form_class = FieldForm
+    template_name = "porter/field.html"
+    
+    def get(self, request, *args, **kwargs):
+        pk, tpk = self.kwargs['pk'], self.kwargs['tpk']
+        form = self.form_class()
+        query_list = Field.objects.filter(template__id=tpk).all()
+        return render(request, self.template_name, {'query_list': query_list, 'form': form, 'pk': pk, 'tpk': tpk})
+
+    def post(self, request, *args, **kwargs):
+        pk, tpk = self.kwargs['pk'], self.kwargs['tpk']
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new = form.save(commit=False)
+            new.tempalte_id = tpk
+            new.save()
+            return redirect('porter:field', pk=pk, tpk=tpk)
+        query_list = Field.objects.filter(template__id=tpk).all()
+        return render(request, self.template_name, {'query_list': query_list, 'form': form, 'pk': pk, 'tpk': tpk})
 
 

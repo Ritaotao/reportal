@@ -23,6 +23,7 @@
                     <thead>
                         <tr>
                             <th>Id</th>
+                            <th>Group</th>
                             <th>Name</th>
                             <th>Create at</th>
                             <th>Create by</th>
@@ -33,6 +34,7 @@
                         {% for item in query_list %}
                         <tr>
                             <td>{{ item.id }}</a></td>
+                            <td>{{ item.group }}</a></td>
                             <td><a href="{% url 'porter:template' item.id %}">{{ item.name }}</a></td>
                             <td>{{ item.create_date }}</td>
                             <td>{{ item.create_by }}</td>

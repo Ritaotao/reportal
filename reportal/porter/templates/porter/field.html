@@ -7,26 +7,24 @@
     <div class="row">
         <div class="col-md-6 col-sm-6">
         <form method="POST" action='' enctype='multipart/form-data'>
-            <h4>Create a new template</h4>
+            <h4>Add a new field</h4>
             <hr/>
             {% csrf_token %}
             {% crispy form %}
-            <a href="{% url 'porter:reportset' %}" class="previous">&laquo; Previous</a>
+            <a href="{% url 'porter:template' pk %}" class="previous">&laquo; Previous</a>
         </form>
         </div>
 
         <div class="col-md-6 col-sm-6">
-            <h4>Edit existing templates</h4>
+            <h4>Edit existing fields</h4>
             <hr/>
             {% if query_list %}
                 <table id="myTable" class="display">
                     <thead>
                         <tr>
                             <th>Id</th>
-                            <th>Uid</th>
                             <th>Name</th>
-                            <th>Create at</th>
-                            <th>Create by</th>
+                            <th>Data Type</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,16 +32,14 @@
                         {% for item in query_list %}
                         <tr>
                             <td>{{ item.id }}</a></td>
-                            <td>{{ item.uid }}</a></td>
-                            <td><a href="{% url 'porter:field' pk item.id %}">{{ item.name }}</a></td>
-                            <td>{{ item.create_date }}</td>
-                            <td>{{ item.create_by }}</td>
+                            <td><a href="{% url 'porter:home' %}">{{ item.name }}</a></td>
+                            <td>{{ item.dtype }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             {% else %}
-                <p>No template available.</p>
+                <p>No field available.</p>
             {% endif %}
         </div>
 

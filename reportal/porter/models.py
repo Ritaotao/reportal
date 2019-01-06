@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class ReportSet(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     group = models.ForeignKey('account.Group', default=1, on_delete=models.SET_DEFAULT, related_name='report_sets')
     create_date = models.DateTimeField(default=timezone.now)
     create_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='report_sets')
@@ -12,7 +12,7 @@ class ReportSet(models.Model):
         return self.name
 
 class Report(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     directory = models.TextField()
     UPLOAD_METHODS = (
         ('APPEND', 'Append'),
@@ -26,7 +26,7 @@ class Report(models.Model):
         return self.name
 
 class Template(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     uid = models.CharField(max_length=8) # used to retrieve template
     report_set = models.ForeignKey(ReportSet, on_delete=models.CASCADE, related_name='templates')
     create_date = models.DateTimeField(default=timezone.now)
@@ -45,7 +45,7 @@ class Submission(models.Model):
 
 class Field(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='fields')
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     DATA_TYPES = (
         ('INTEGER', 'Integer'),
         ('FLOAT', 'Float'),
@@ -58,7 +58,7 @@ class Field(models.Model):
         return self.name
 
 class Rule(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True) # default error message
     has_argument = models.BooleanField(default=False)

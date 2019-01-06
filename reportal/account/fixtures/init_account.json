@@ -1,0 +1,38 @@
+[
+    {
+      "model": "account.group",
+      "pk": 1,
+      "fields": {
+        "name": "All"
+      }
+    },
+    {
+        "model": "account.group",
+        "pk": 2,
+        "fields": {
+          "name": "Group1"
+        }
+    },
+    {
+        "model": "account.role",
+        "pk": 1,
+        "fields": {
+          "name": "Viewer",
+          "can_create": "False",
+          "can_update": "False",
+          "can_delete": "False",
+          "can_submit": "True"
+        }
+    },
+    {
+        "model": "account.role",
+        "pk": 2,
+        "fields": {
+          "name": "Admin",
+          "can_create": "True",
+          "can_update": "True",
+          "can_delete": "True",
+          "can_submit": "True"
+        }
+    }
+]
