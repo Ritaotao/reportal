@@ -1,53 +1,42 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-
-
-    <div class="row">
-        <div class="col-md-6 col-sm-6">
-        <form method="POST" action='' enctype='multipart/form-data'>
-            <h4>Create a new report set</h4>
-            <hr/>
-            {% csrf_token %}
-            {% crispy form %}
-            <a href="{% url 'porter:home' %}" class="previous">&laquo; Previous</a>
-        </form>
-        </div>
-
-        <div class="col-md-6 col-sm-6">
-            <h4>Select an existing report set</h4>
-            <hr/>
-            {% if query_list %}
-                <table id="myTable" class="display">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Group</th>
-                            <th>Name</th>
-                            <th>Create at</th>
-                            <th>Create by</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        {% for item in query_list %}
-                        <tr>
-                            <td>{{ item.id }}</a></td>
-                            <td>{{ item.group }}</a></td>
-                            <td><a href="{% url 'porter:template' item.id %}">{{ item.name }}</a></td>
-                            <td>{{ item.create_date }}</td>
-                            <td>{{ item.create_by }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>No report set available.</p>
-            {% endif %}
-        </div>
-
-    </div>
-
-
+    <a href="{% url 'porter:home' %}" class="previous">&laquo; Previous</a>
+    <a href="{% url 'porter:reportset_add' %}">Add</a>
+    {% include 'porter/reportset_create.html' %}
+    <h4>Select an existing report set</h4>
+    <hr/>
+    {% if object_list %}
+        <table id="myTable" class="display">
+            <thead>
+                <tr>
+                    <th>Date Created</th>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Group</th>
+                    <th>Create By</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for item in object_list %}
+                <tr>
+                    <td>{{ item.create_date }}</td>
+                    <td><a href="{% url 'porter:template' item.id %}"></a>{{ item.id }}</a></td>
+                    <td>{{ item.name }}</a></td>
+                    <td>{{ item.group }}</a></td>
+                    <td>{{ item.create_by }}</td>
+                    <td><a href="{% url 'porter:reportset_edit' item.id %}">Update</a></td>
+                    <td>Delete</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No report set available.</p>
+    {% endif %}
+    
 {% endblock %}

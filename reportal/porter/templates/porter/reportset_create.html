@@ -1,0 +1,27 @@
+{% load crispy_forms_tags %}
+<div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                        <h4 class="modal-title">Report set</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div id="form-modal-body" class="modal-body">
+                        <form method="POST" action="" enctype='multipart/form-data'>
+                            {% csrf_token %}
+                            {% crispy form %}
+                        </form>           
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+</div>
+{% if form.errors or request.resolver_match.kwargs.pk or 'add' in request.build_absolute_uri %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#form-modal").modal('show');
+    });
+</script>
+{% endif %}  

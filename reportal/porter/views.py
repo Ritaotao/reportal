@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect #, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.urls import reverse
 from django.views import View
+from django.views.generic import ListView, FormView, CreateView, UpdateView
 from .models import ReportSet, Template, Submission, Field
 from .forms import ReportSetForm, TemplateForm, FieldForm
 
@@ -20,22 +22,29 @@ def index(request):
 
 # create portal
 ## Step 1: create a new report set or use an existing one
+
 class ReportSetView(View):
-    form_class = ReportSetForm
     template_name = "porter/reportset.html"
-    query_list = ReportSet.objects.all()
+    form_class = ReportSetForm
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
-        return render(request, self.template_name, {'query_list': self.query_list, 'form': form})
+        object_list = ReportSet.objects.all()
+        pk = self.kwargs.get('pk', None)
+        initial = ReportSet.objects.filter(pk=pk).first()
+        print(initial)
+        form = self.form_class(instance=initial)
+        return render(request, self.template_name, {'object_list': object_list, 'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        object_list = ReportSet.objects.all()
+        pk = self.kwargs.get('pk', None)
+        initial = ReportSet.objects.filter(pk=pk).first()
+        form = self.form_class(request.POST, instance=initial)
         if form.is_valid():
+            # <process form cleaned data>
             form.save()
             return redirect('porter:reportset')
-        return render(request, self.template_name, {'query_list': self.query_list, 'form': form})
-
+        return render(request, self.template_name, {'object_list': object_list, 'form': form})
 
 class TemplateView(View):
     form_class = TemplateForm
