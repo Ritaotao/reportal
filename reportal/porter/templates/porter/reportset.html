@@ -1,42 +1,80 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-    <a href="{% url 'porter:home' %}" class="previous">&laquo; Previous</a>
-    <a href="{% url 'porter:reportset_add' %}">Add</a>
-    {% include 'porter/reportset_create.html' %}
-    <h4>Select an existing report set</h4>
-    <hr/>
-    {% if object_list %}
-        <table id="myTable" class="display">
-            <thead>
-                <tr>
-                    <th>Date Created</th>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Group</th>
-                    <th>Create By</th>
-                    <th>Update</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-            <tbody>
-                
-                {% for item in object_list %}
-                <tr>
-                    <td>{{ item.create_date }}</td>
-                    <td><a href="{% url 'porter:template' item.id %}"></a>{{ item.id }}</a></td>
-                    <td>{{ item.name }}</a></td>
-                    <td>{{ item.group }}</a></td>
-                    <td>{{ item.create_by }}</td>
-                    <td><a href="{% url 'porter:reportset_edit' item.id %}">Update</a></td>
-                    <td>Delete</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No report set available.</p>
-    {% endif %}
+    <a href="/" class="previous">&laquo; Previous</a>
+
+    <!-- New  button -->
+    <div class="text-center">
+        <button type="button" data-dismiss="modal" class="btn btn-primary" id="new">New</button>
+    </div>
+
+    <!-- datatables -->
+    <table id="datatables" class="table table-hover">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>group</th>
+                <th>created_at</th>
+                <th>created_by</th>
+                <th>last_modify_date</th>
+                <th>action</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
     
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- NEW and EDIT modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                            <h4 class="modal-title" id="modal_title"></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            
+                    </div>
+                    <div class="modal-body">
+                       <form method="POST" action="" enctype='multipart/form-data'>
+                                {% csrf_token %}
+                                {% crispy form %}
+                                <input type="hidden" id="type" name="type" value="">
+                                <button type="submit" class="btn btn-success btn-block">
+                                    <span class="glyphicon glyphicon-ok"></span> OK
+                                </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="confirm" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Are you sure?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% if form.errors  %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#myModal").modal('show');
+            });
+        </script>
+        {% endif %} 
 {% endblock %}

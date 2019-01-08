@@ -1,10 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http.response import HttpResponse
 from django.urls import reverse
 from django.views import View
-from django.views.generic import ListView, FormView, CreateView, UpdateView
 from .models import ReportSet, Template, Submission, Field
+from .models import query_rs_by_args
 from .forms import ReportSetForm, TemplateForm, FieldForm
+from django.template.response import TemplateResponse
+
+from rest_framework import viewsets, status
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.decorators import list_route
+# from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .serializers import ReportSetSerializer
 
 import random
 
@@ -17,34 +25,35 @@ def genUid():
         return rand
 
 # Create your views here.
-def index(request):
-    return render(request, "porter/home.html")
-
 # create portal
 ## Step 1: create a new report set or use an existing one
+def reportsetIndex(request):
+    form = ReportSetForm(request.POST or None)
+    if form.is_valid():
+        print('saved')
+        form.save()
+    html = TemplateResponse(request, 'porter/reportset.html', {'form': form})
+    return HttpResponse(html.render())
 
-class ReportSetView(View):
-    template_name = "porter/reportset.html"
-    form_class = ReportSetForm
+class ReportSetViewSet(viewsets.ModelViewSet):
+    queryset = ReportSet.objects.all()
+    serializer_class = ReportSetSerializer
 
-    def get(self, request, *args, **kwargs):
-        object_list = ReportSet.objects.all()
-        pk = self.kwargs.get('pk', None)
-        initial = ReportSet.objects.filter(pk=pk).first()
-        print(initial)
-        form = self.form_class(instance=initial)
-        return render(request, self.template_name, {'object_list': object_list, 'form': form})
+    #permission_classes = (IsAuthenticated,)
 
-    def post(self, request, *args, **kwargs):
-        object_list = ReportSet.objects.all()
-        pk = self.kwargs.get('pk', None)
-        initial = ReportSet.objects.filter(pk=pk).first()
-        form = self.form_class(request.POST, instance=initial)
-        if form.is_valid():
-            # <process form cleaned data>
-            form.save()
-            return redirect('porter:reportset')
-        return render(request, self.template_name, {'object_list': object_list, 'form': form})
+    def list(self, request, **kwargs):
+        try:
+            reportset = query_rs_by_args(**request.query_params)
+            serializer = ReportSetSerializer(reportset['items'], many=True)
+            result = dict()
+            result['data'] = serializer.data
+            result['draw'] = reportset['draw']
+            result['recordsTotal'] = reportset['total']
+            result['recordsFiltered'] = reportset['count']
+            return Response(result, status=status.HTTP_200_OK, template_name=None, content_type=None)
+
+        except Exception as e:
+            return Response(e, status=status.HTTP_404_NOT_FOUND, template_name=None, content_type=None)
 
 class TemplateView(View):
     form_class = TemplateForm
