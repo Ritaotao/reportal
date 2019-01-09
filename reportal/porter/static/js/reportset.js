@@ -8,14 +8,23 @@ let table = $('#datatables').DataTable({
     "columns": [
         {"data": "id"},
         {"data": "name"},
-        {"data": "group"},
+        {"data": "group.id"},
+        {"data": "group.name"},
         {"data": "create_date"},
-        {"data": "create_by"},
+        {"data": "create_by.username"},
         {"data": "last_modify_date"},
         {
             "data": null,
             "defaultContent": '<button type="button" class="btn btn-info">Edit</button>' + '&nbsp;&nbsp' + 
             '<button type="button" class="btn btn-danger">Delete</button>'
+        }
+    ],
+    "columnDefs": [
+        {
+            // hide Group ID
+            "targets": [ 2 ],
+            "visible": false,
+            "searchable": false
         }
     ]
 });
@@ -29,7 +38,7 @@ $('#datatables tbody').on('click', 'button', function () {
     if (class_name == 'btn btn-info') {
         // EDIT button
         $('#id_name').val(data['name']);
-        $('#id_group').val(data['group']);
+        $('#id_group').val(data['group']['id']);
         $('#type').val('edit');
         $('#modal_title').text('EDIT');
         $('#myModal').modal();

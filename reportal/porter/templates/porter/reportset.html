@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% load crispy_forms_tags %}
+
 
 {% block content %}
     <a href="/" class="previous">&laquo; Previous</a>
@@ -16,6 +16,7 @@
             <tr>
                 <th>id</th>
                 <th>name</th>
+                <th>group_id</th>
                 <th>group</th>
                 <th>created_at</th>
                 <th>created_by</th>
@@ -29,52 +30,6 @@
             </tr>
         </tfoot>
     </table>
+{% include 'porter/editdelete_modal.html' %}
 
-    <!-- NEW and EDIT modal -->
-    <div class="modal fade" id="myModal" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                            <h4 class="modal-title" id="modal_title"></h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            
-                    </div>
-                    <div class="modal-body">
-                       <form method="POST" action="" enctype='multipart/form-data'>
-                                {% csrf_token %}
-                                {% crispy form %}
-                                <input type="hidden" id="type" name="type" value="">
-                                <button type="submit" class="btn btn-success btn-block">
-                                    <span class="glyphicon glyphicon-ok"></span> OK
-                                </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-    </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="confirm" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Are you sure?</h4>
-                    </div>
-                    <div class="modal-body">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
-                        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    {% if form.errors  %}
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $("#myModal").modal('show');
-            });
-        </script>
-        {% endif %} 
 {% endblock %}

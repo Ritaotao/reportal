@@ -9,6 +9,8 @@ class Group(models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.name
+    def __unicode__(self):
+        return self.name
 
 
 class Role(models.Model):

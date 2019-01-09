@@ -4,7 +4,7 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'reportset', views.ReportSetViewSet)
+router.register(r'reportset', views.ReportSetViewSet, base_name='reportset')
 
 app_name = "porter"
 urlpatterns = [
