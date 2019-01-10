@@ -2,14 +2,16 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from .models import ReportSet, Template, Report, Field
+from account.models import Group
 
 class ReportSetForm(forms.ModelForm):
     class Meta:
         model = ReportSet
         fields = ['name', 'group']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super(ReportSetForm, self).__init__(*args, **kwargs)
+        self.fields['group'].queryset = Group.objects.filter(profiles__user=user)
         # If you pass FormHelper constructor a form instance
         # It builds a default layout with all its fields
         self.helper = FormHelper()

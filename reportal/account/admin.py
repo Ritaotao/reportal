@@ -15,9 +15,5 @@ class RoleAdmin(admin.ModelAdmin):
     #list_filter=()
     #search_fields=()
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display=('user', 'role', 'group', 'title', 'organization',)
-    list_filter=('role','group','organization',)
-    #search_fields=()
+admin.site.register(Profile)
 

@@ -1,7 +1,5 @@
 from django.db import models
-
 from django.contrib.auth.models import User
-from model_utils import Choices
 
 # Create your models here.
 class ReportSet(models.Model):
@@ -14,14 +12,15 @@ class ReportSet(models.Model):
     def __str__(self):
         return self.name
 
-RS_ORDER_COLUMN_CHOICES = Choices(
-    ('0', 'id'),
-    ('1', 'name'),
-    ('2', 'group'),
-    ('3', 'create_date'),
-    ('4', 'created_by'),
-    ('5', 'last_modify_date'),
-)
+class Template(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    uid = models.CharField(max_length=8) # used to retrieve template
+    report_set = models.ForeignKey(ReportSet, on_delete=models.CASCADE, related_name='templates')
+    last_modify_date = models.DateTimeField(auto_now=True, null=True)
+    create_date = models.DateTimeField(auto_now_add=True, null=True)
+    create_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='templates')
+    def __str__(self):
+        return self.name
 
 class Report(models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -38,15 +37,7 @@ class Report(models.Model):
     def __str__(self):
         return self.name
 
-class Template(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    uid = models.CharField(max_length=8) # used to retrieve template
-    report_set = models.ForeignKey(ReportSet, on_delete=models.CASCADE, related_name='templates')
-    last_modify_date = models.DateTimeField(auto_now=True, null=True)
-    create_date = models.DateTimeField(auto_now_add=True, null=True)
-    create_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='templates')
-    def __str__(self):
-        return self.name
+
 
 class Submission(models.Model):
     report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='submissions')

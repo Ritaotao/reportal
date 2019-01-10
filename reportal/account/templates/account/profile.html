@@ -9,7 +9,7 @@
             {% csrf_token %}
             {% crispy user_form %}
             {% crispy profile_form %}  
-            <a href="{% url 'porter:home' %}" class="btn btn-info">&laquo; Back</a>
+            <a href="/" class="btn btn-info">&laquo; Back</a>
             <input class="btn btn-primary" type="submit" value="Update">
         </form>       
 {% endblock content %}

@@ -9,8 +9,6 @@ class Group(models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.name
-    def __unicode__(self):
-        return self.name
 
 
 class Role(models.Model):
@@ -27,9 +25,11 @@ class Role(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profiles')
     role = models.ForeignKey(Role, default=1, on_delete=models.SET_DEFAULT)
-    group = models.ForeignKey(Group, default=1, on_delete=models.SET_DEFAULT)
+    groups = models.ManyToManyField(Group, related_name='profiles')
     title = models.CharField(max_length=200, default='', blank=True)
     organization = models.CharField(max_length=200, default='', blank=True)
+    def __str__(self):
+        return self.user.username
 
 """
 def create_profile(sender, **kwargs):

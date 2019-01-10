@@ -1,53 +1,39 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% load crispy_forms_tags %}
+
+
 {% block content %}
+    <a href="{% url 'porter:reportset' %}" class="previous">&laquo; Previous</a>
 
-
-    <div class="row">
-        <div class="col-md-6 col-sm-6">
-        <form method="POST" action='' enctype='multipart/form-data'>
-            <h4>Create a new template</h4>
-            <hr/>
-            {% csrf_token %}
-            {% crispy form %}
-            <a href="{% url 'porter:reportset' %}" class="previous">&laquo; Previous</a>
-        </form>
-        </div>
-
-        <div class="col-md-6 col-sm-6">
-            <h4>Edit existing templates</h4>
-            <hr/>
-            {% if query_list %}
-                <table id="myTable" class="display">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Uid</th>
-                            <th>Name</th>
-                            <th>Create at</th>
-                            <th>Create by</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        {% for item in query_list %}
-                        <tr>
-                            <td>{{ item.id }}</a></td>
-                            <td>{{ item.uid }}</a></td>
-                            <td><a href="{% url 'porter:field' pk item.id %}">{{ item.name }}</a></td>
-                            <td>{{ item.create_date }}</td>
-                            <td>{{ item.create_by }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>No template available.</p>
-            {% endif %}
-        </div>
-
+    <!-- New  button -->
+    <div class="text-center">
+        <button type="button" data-dismiss="modal" class="btn btn-primary" id="new">New</button>
     </div>
 
+    <!-- datatables -->
+    <table id="datatables" class="table table-hover">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>uid</th>
+                <th>create_date</th>
+                <th>create_by</th>
+                <th>last_modify_date</th>
+                <th>action</th>
+            </tr>
+        </thead>
 
+        <tfoot>
+            <tr>
+    
+            </tr>
+        </tfoot>
+    </table>
+{% include 'porter/editdelete_modal.html' %}
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'js/template.js' %}"></script>
 {% endblock %}

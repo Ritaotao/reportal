@@ -16,14 +16,15 @@
             <tr>
                 <th>id</th>
                 <th>name</th>
-                <th>group_id</th>
                 <th>group</th>
-                <th>created_at</th>
-                <th>created_by</th>
+                <th>create_date</th>
+                <th>create_by</th>
                 <th>last_modify_date</th>
+                <th>group_id</th>
                 <th>action</th>
             </tr>
         </thead>
+
         <tfoot>
             <tr>
     
@@ -32,4 +33,8 @@
     </table>
 {% include 'porter/editdelete_modal.html' %}
 
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'js/reportset.js' %}"></script>
 {% endblock %}
