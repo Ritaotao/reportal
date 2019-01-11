@@ -29,9 +29,10 @@ def genUid():
 # create portal
 ## Step 1: create a new report set or use an existing one
 
-def reportsetIndex(request):
+def reportsetIndex(request, pk=None):
     """template and form: create, update"""
-    form = ReportSetForm(request.user, request.POST or None)
+    instance = get_object_or_404(ReportSet, pk=pk) if pk else None
+    form = ReportSetForm(request.user, request.POST or None, instance=instance)
     if form.is_valid():
         obj = form.save(commit=False)
         obj.create_by = request.user
@@ -47,13 +48,14 @@ class ReportSetViewSet(viewsets.ModelViewSet):
         groups = Group.objects.filter(profiles__user=self.request.user)
         return ReportSet.objects.filter(group__in=groups)
 
-def templateIndex(request, pk):
+def templateIndex(request, rspk, pk=None):
     """template and form: create, update"""
-    form = TemplateForm(request.POST or None)
+    instance = get_object_or_404(Template, pk=pk) if pk else None
+    form = TemplateForm(request.POST or None, instance=instance)
     if form.is_valid():
         obj = form.save(commit=False)
         obj.uid = genUid()
-        obj.report_set_id = pk
+        obj.report_set_id = rspk
         obj.save()
     html = TemplateResponse(request, 'porter/template.html', {'form': form})
     return HttpResponse(html.render())

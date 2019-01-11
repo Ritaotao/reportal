@@ -3,12 +3,11 @@
 
 
 {% block content %}
-    <a href="{% url 'porter:reportset' %}" class="previous">&laquo; Previous</a>
 
-    <!-- New  button -->
-    <div class="text-center">
-        <button type="button" data-dismiss="modal" class="btn btn-primary" id="new">New</button>
-    </div>
+    <div class="flex">
+        <div class="left"><a href="{% url 'porter:reportset' %}" class="previous">&laquo; Previous</a></div>
+        <div class="right"><button type="button" data-dismiss="modal" class="btn btn-primary btn-sm" id="new">+</button></div>
+      </div>
 
     <!-- datatables -->
     <table id="datatables" class="table table-hover">

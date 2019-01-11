@@ -10,7 +10,7 @@
                     
             </div>
             <div class="modal-body">
-               <form method="POST" action="" enctype='multipart/form-data'>
+               <form method="POST" action="" enctype='multipart/form-data' id='modal-form'>
                         {% csrf_token %}
                         {% crispy form %}
                         <input type="hidden" id="type" name="type" value="">
