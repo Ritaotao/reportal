@@ -13,17 +13,21 @@ class ReportSet(models.Model):
         return self.name
 
 class Template(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    uid = models.CharField(max_length=8) # used to retrieve template
+    name = models.CharField(max_length=200)
+    uid = models.CharField(max_length=8, unique=True) # used to retrieve template
     report_set = models.ForeignKey(ReportSet, on_delete=models.CASCADE, related_name='templates')
     last_modify_date = models.DateTimeField(auto_now=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True, null=True)
     create_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='templates')
+
+    class Meta:
+        unique_together = ('report_set', 'name',)
+
     def __str__(self):
         return self.name
 
 class Report(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     directory = models.TextField()
     UPLOAD_METHODS = (
         ('APPEND', 'Append'),
@@ -34,9 +38,12 @@ class Report(models.Model):
     last_modify_date = models.DateTimeField(auto_now=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True, null=True)
     create_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='reports')
+
+    class Meta:
+        unique_together = ('report_set', 'name',)
+
     def __str__(self):
         return self.name
-
 
 
 class Submission(models.Model):
@@ -59,6 +66,10 @@ class Field(models.Model):
         ('DATETIME', 'Datetime')
     )
     dtype = models.CharField(max_length=20, choices=DATA_TYPES)
+
+    class Meta:
+        unique_together = ('template', 'name',)
+
     def __str__(self):
         return self.name
 

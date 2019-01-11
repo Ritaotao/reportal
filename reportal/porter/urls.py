@@ -12,6 +12,6 @@ urlpatterns = [
     re_path(r'^api/', include(router.urls)),
     #re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('reportset/', views.reportsetIndex, name='reportset'),
-    path('template/', views.templateIndex, name='template'),
+    path('template/<int:pk>/', views.templateIndex, name='template'),
     path('reportset=<int:pk>/template=<int:tpk>', views.FieldView.as_view(), name='field'),
 ]

@@ -34,7 +34,6 @@ class TemplateForm(forms.ModelForm):
         self.helper.form_class = 'form-horizontal'
         self.helper.label_class = 'col-lg-2'
         self.helper.field_class = 'col-lg-8'
-        self.helper.add_input(Submit('submit', 'Create'))
 
 class FieldForm(forms.ModelForm):
     class Meta:

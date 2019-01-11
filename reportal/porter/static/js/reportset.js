@@ -39,7 +39,7 @@ $('#datatables tbody').on('click', 'button', function () {
     let class_name = $(this).attr('class');
     if (class_name == 'btn btn-success') {
         // GO button
-        window.location = location.origin + '/template/?report_set=' + data['id']
+        window.location = location.origin + '/template/' + data['id']
     } else if (class_name == 'btn btn-info') {
         // EDIT button
         $('#id_name').val(data['name']);

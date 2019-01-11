@@ -47,7 +47,7 @@ class ReportSetViewSet(viewsets.ModelViewSet):
         groups = Group.objects.filter(profiles__user=self.request.user)
         return ReportSet.objects.filter(group__in=groups)
 
-def templateIndex(request):
+def templateIndex(request, pk):
     """template and form: create, update"""
     form = TemplateForm(request.POST or None)
     if form.is_valid():
@@ -63,12 +63,11 @@ class TemplateViewSet(viewsets.ModelViewSet):
     serializer_class = TemplateSerializer
 
     def get_queryset(self):
-        queryset = Template.objects.all()
+        groups = Group.objects.filter(profiles__user=self.request.user)
+        queryset = Template.objects.filter(report_set__group__in=groups)
         report_set = self.request.query_params.get('report_set', None)
         if report_set is not None:
             queryset = queryset.filter(report_set__id=report_set)
-        else:
-            print("none")
         return queryset
 
 class FieldView(View):
