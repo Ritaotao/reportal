@@ -4,16 +4,13 @@ from django.urls import reverse
 from django.views import View
 from .models import ReportSet, Template, Submission, Field
 from account.models import Group, User, Profile
-from django.db.models import Q, Prefetch
-from model_utils import Choices
 from .forms import ReportSetForm, TemplateForm, FieldForm
 from django.template.response import TemplateResponse
 
 from rest_framework import viewsets, status
 # from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
-from .serializers import ReportSetSerializer, TemplateSerializer
+from .serializers import ReportSetSerializer, TemplateSerializer, FieldSerializer
 
 import random
 
@@ -30,18 +27,20 @@ def genUid():
 ## Step 1: create a new report set or use an existing one
 
 def reportsetIndex(request, pk=None):
-    """template and form: create, update"""
+    """render form and form validation,
+        reportset.js controls form action and adds parameters to url"""
+    scope = 'reportset'
     instance = get_object_or_404(ReportSet, pk=pk) if pk else None
     form = ReportSetForm(request.user, request.POST or None, instance=instance)
     if form.is_valid():
         obj = form.save(commit=False)
         obj.create_by = request.user
         obj.save()
-    html = TemplateResponse(request, 'porter/reportset.html', {'form': form})
+    html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
 class ReportSetViewSet(viewsets.ModelViewSet):
-    """datatable: list, delete"""
+    """drf to datatable, filter qs"""
     serializer_class = ReportSetSerializer
 
     def get_queryset(self):
@@ -49,7 +48,9 @@ class ReportSetViewSet(viewsets.ModelViewSet):
         return ReportSet.objects.filter(group__in=groups)
 
 def templateIndex(request, rspk, pk=None):
-    """template and form: create, update"""
+    """render form and form validation,
+        template.js controls form action and adds parameters to url"""
+    scope = 'template'
     instance = get_object_or_404(Template, pk=pk) if pk else None
     form = TemplateForm(request.POST or None, instance=instance)
     if form.is_valid():
@@ -57,11 +58,11 @@ def templateIndex(request, rspk, pk=None):
         obj.uid = genUid()
         obj.report_set_id = rspk
         obj.save()
-    html = TemplateResponse(request, 'porter/template.html', {'form': form})
+    html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
 class TemplateViewSet(viewsets.ModelViewSet):
-    """datatable: list, delete"""
+    """drf to datatable, filter qs"""
     serializer_class = TemplateSerializer
 
     def get_queryset(self):
@@ -72,25 +73,29 @@ class TemplateViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(report_set__id=report_set)
         return queryset
 
-class FieldView(View):
-    form_class = FieldForm
-    template_name = "porter/field.html"
-    
-    def get(self, request, *args, **kwargs):
-        pk, tpk = self.kwargs['pk'], self.kwargs['tpk']
-        form = self.form_class()
-        query_list = Field.objects.filter(template__id=tpk).all()
-        return render(request, self.template_name, {'query_list': query_list, 'form': form, 'pk': pk, 'tpk': tpk})
+def fieldIndex(request, rspk, tpk, pk=None):
+    """render form and form validation,
+        template.js controls form action and adds parameters to url"""
+    scope = 'field'
+    instance = get_object_or_404(Field, pk=pk) if pk else None
+    form = FieldForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.template_id = tpk
+        obj.save()
+    html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope, 'rspk': rspk})
+    return HttpResponse(html.render())
 
-    def post(self, request, *args, **kwargs):
-        pk, tpk = self.kwargs['pk'], self.kwargs['tpk']
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            new = form.save(commit=False)
-            new.tempalte_id = tpk
-            new.save()
-            return redirect('porter:field', pk=pk, tpk=tpk)
-        query_list = Field.objects.filter(template__id=tpk).all()
-        return render(request, self.template_name, {'query_list': query_list, 'form': form, 'pk': pk, 'tpk': tpk})
+class FieldViewSet(viewsets.ModelViewSet):
+    """drf to datatable, filter qs"""
+    serializer_class = FieldSerializer
+
+    def get_queryset(self):
+        groups = Group.objects.filter(profiles__user=self.request.user)
+        queryset = Field.objects.filter(template__report_set__group__in=groups)
+        template = self.request.query_params.get('template', None)
+        if template is not None:
+            queryset = queryset.filter(template__id=template)
+        return queryset
 
 

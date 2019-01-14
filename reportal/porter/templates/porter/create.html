@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+
+{% block content %}
+
+    <div class="flex">
+        <div class="left"><a id="previous" href="#" class="previous">&laquo; Previous</a></div>
+        <div class="right"><button type="button" data-dismiss="modal" class="btn btn-primary btn-sm" id="new">+</button></div>
+      </div>
+
+    <!-- datatables, js renders thead and tbody-->
+    <table id="datatables" class="table table-hover"></table>
+{% include 'porter/editdelete_modal.html' %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {% if scope == 'reportset' %}
+        <script src="{% static 'js/reportset.js' %}"></script>
+    {% elif scope == 'template' %}
+        <script src="{% static 'js/template.js' %}"></script>
+    {% elif scope == 'field' %}
+        <script src="{% static 'js/field.js' %}"></script>
+    {% endif %}
+{% endblock %}

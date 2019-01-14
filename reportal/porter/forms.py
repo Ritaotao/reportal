@@ -4,6 +4,14 @@ from crispy_forms.layout import Submit
 from .models import ReportSet, Template, Report, Field
 from account.models import Group
 
+def form_horizontal():
+    helper = FormHelper()
+    helper.form_tag = False
+    helper.form_class = 'form-horizontal'
+    helper.label_class = 'col-lg-2'
+    helper.field_class = 'col-lg-8'
+    return helper
+
 class ReportSetForm(forms.ModelForm):
     class Meta:
         model = ReportSet
@@ -11,14 +19,11 @@ class ReportSetForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(ReportSetForm, self).__init__(*args, **kwargs)
+        # limit group options based on user
         self.fields['group'].queryset = Group.objects.filter(profiles__user=user)
         # If you pass FormHelper constructor a form instance
         # It builds a default layout with all its fields
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-8'
+        self.helper = form_horizontal()
 
 class TemplateForm(forms.ModelForm):
     class Meta:
@@ -27,13 +32,7 @@ class TemplateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(TemplateForm, self).__init__(*args, **kwargs)
-        # If you pass FormHelper constructor a form instance
-        # It builds a default layout with all its fields
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-8'
+        self.helper = form_horizontal()
 
 class FieldForm(forms.ModelForm):
     class Meta:
@@ -42,11 +41,4 @@ class FieldForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FieldForm, self).__init__(*args, **kwargs)
-        # If you pass FormHelper constructor a form instance
-        # It builds a default layout with all its fields
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-8'
-        self.helper.add_input(Submit('submit', 'Add'))
+        self.helper = form_horizontal()

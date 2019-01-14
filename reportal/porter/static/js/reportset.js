@@ -7,14 +7,15 @@ let table = $('#datatables').DataTable({
         "dataSrc": ""
     },
     "columns": [
-        {"data": "id"},
-        {"data": "name"},
-        {"data": "group.name"},
-        {"data": "create_date"},
-        {"data": "create_by.username"},
-        {"data": "last_modify_date"},
-        {"data": "group.id"},
+        {"title": "id", "data": "id"},
+        {"title": "name", "data": "name"},
+        {"title": "group", "data": "group.name"},
+        {"title": "create_date", "data": "create_date"},
+        {"title": "create_by", "data": "create_by.username"},
+        {"title": "last_modify_date", "data": "last_modify_date"},
+        {"title": "group_id", "data": "group.id"},
         {
+            "title": "action",
             "data": null,
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
@@ -84,3 +85,7 @@ $('#new').on('click', function (e) {
     $('#modal_title').text('NEW');
     $("#myModal").modal();
 })
+
+$('#previous').on('click', function (e) {
+    window.location = location.origin;
+});

@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import ReportSet, Template
+from .models import ReportSet, Template, Field
 from account.models import Group, User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,4 +27,9 @@ class ReportSetSerializer(GenericMetaFieldMixin, serializers.ModelSerializer):
 class TemplateSerializer(GenericMetaFieldMixin, serializers.ModelSerializer):
     class Meta:
         model = Template
+        fields = "__all__"
+
+class FieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Field
         fields = "__all__"
