@@ -2,15 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http.response import HttpResponse
 from django.urls import reverse
 from django.views import View
-from .models import ReportSet, Template, Submission, Field
+from .models import ReportSet, Template, Submission, Field, Report
 from account.models import Group, User, Profile
-from .forms import ReportSetForm, TemplateForm, FieldForm
+from .forms import ReportSetForm, TemplateForm, FieldForm, ReportForm
 from django.template.response import TemplateResponse
 
 from rest_framework import viewsets, status
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import ReportSetSerializer, TemplateSerializer, FieldSerializer
+from .serializers import ReportSetSerializer, TemplateSerializer, FieldSerializer, ReportSerializer
 
 import random
 
@@ -34,7 +34,8 @@ def reportsetIndex(request, pk=None):
     form = ReportSetForm(request.user, request.POST or None, instance=instance)
     if form.is_valid():
         obj = form.save(commit=False)
-        obj.create_by = request.user
+        if not pk:
+            obj.create_by = request.user
         obj.save()
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
@@ -55,8 +56,10 @@ def templateIndex(request, rspk, pk=None):
     form = TemplateForm(request.POST or None, instance=instance)
     if form.is_valid():
         obj = form.save(commit=False)
-        obj.uid = genUid()
         obj.report_set_id = rspk
+        if not pk:
+            obj.uid = genUid()
+            obj.create_by = request.user        
         obj.save()
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
@@ -98,4 +101,30 @@ class FieldViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(template__id=template)
         return queryset
 
+def reportIndex(request, rspk, pk=None):
+    """render form and form validation,
+        report.js controls form action and adds parameters to url"""
+    scope = 'report'
+    instance = get_object_or_404(Report, pk=pk) if pk else None
+    form = ReportForm(rspk, request.POST or None, instance=instance)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.report_set_id = rspk
+        if not pk:
+            obj.create_by = request.user
+        obj.save()
+        form.save_m2m()
+    html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
+    return HttpResponse(html.render())
 
+class ReportViewSet(viewsets.ModelViewSet):
+    """drf to datatable, filter qs"""
+    serializer_class = ReportSerializer
+
+    def get_queryset(self):
+        groups = Group.objects.filter(profiles__user=self.request.user)
+        queryset = Report.objects.filter(report_set__group__in=groups)
+        report_set = self.request.query_params.get('report_set', None)
+        if report_set is not None:
+            queryset = queryset.filter(report_set__id=report_set)
+        return queryset

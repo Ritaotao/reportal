@@ -6,7 +6,10 @@ from .models import ReportSet, Report, Template, Submission, Field, Rule, Qualit
 class ReportSetAdmin(admin.ModelAdmin):
     list_display=('id','name','group','last_modify_date','create_date','create_by')
 
-admin.site.register(Report)
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display=('id','name','method','report_set','last_modify_date','create_date','create_by')
+
 admin.site.register(Template)
 admin.site.register(Field)
 

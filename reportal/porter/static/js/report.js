@@ -8,9 +8,10 @@ if (url_array.length == 5) {
 } else {
     spk = url_array[url_array.length-2];
 }
+
 console.log(spk, pk);
 // query_param for drf, form_param for form
-let current = '/template/'
+let current = '/report/'
 let qp = "?report_set=" + spk;
 let fp = current + spk + '/';
 
@@ -23,7 +24,8 @@ let table = $('#datatables').DataTable({
     "columns": [
         {"title": "id", "data": "id"},
         {"title": "name", "data": "name"},
-        {"title": "uid", "data": "uid"},
+        {"title": "method", "data": "method"},
+        {"title": "templates", "data": "templates"},
         {"title": "create_date", "data": "create_date"},
         {"title": "create_by", "data": "create_by.username"},
         {"title": "last_modify_date", "data": "last_modify_date"},
@@ -46,14 +48,16 @@ let id = 0;
 $('#datatables tbody').on('click', 'a', function () {
     let data = table.row($(this).parents('tr')).data();
     id = data['id'];
-
+    console.log(data['templates']);
     let id_name = $(this).attr("id");
     if (id_name == 'btn-go') {
         // GO button
-        window.location = location.origin + '/field/' + spk + '/' + id; 
+        // window.location = location.origin + '/quality/' + spk + '/' + id; 
     } else if (id_name == 'btn-edit') {
         // EDIT button
         $('#id_name').val(data['name']);
+        $('#id_method').val(data['method']);
+        $('#id_templates').val(data['templates']);
         // bind item id to url
         $('#modal-form').attr('action', fp + id + '/');
         $('#myModal').modal();
@@ -83,6 +87,8 @@ $('#confirm').on('click', '#delete', function (e) {
 
 $('#new').on('click', function (e) {
     $('#id_name').val('');
+    $('#id_method').val('');
+    $('#id_templates').val('');
     $('#modal-form').attr('action', fp);
     $('#modal_title').text('NEW');
     $("#myModal").modal();

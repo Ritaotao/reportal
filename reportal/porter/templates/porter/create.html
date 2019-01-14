@@ -6,7 +6,7 @@
 
     <div class="flex">
         <div class="left"><a id="previous" href="#" class="previous">&laquo; Previous</a></div>
-        <div class="right"><button type="button" data-dismiss="modal" class="btn btn-primary btn-sm" id="new">+</button></div>
+        <div class="right"><button type="button" data-dismiss="modal" class="btn btn-info btn-sm" id="new">+</button></div>
       </div>
 
     <!-- datatables, js renders thead and tbody-->
@@ -22,5 +22,7 @@
         <script src="{% static 'js/template.js' %}"></script>
     {% elif scope == 'field' %}
         <script src="{% static 'js/field.js' %}"></script>
+    {% elif scope == 'report' %}
+        <script src="{% static 'js/report.js' %}"></script>
     {% endif %}
 {% endblock %}

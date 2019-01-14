@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from .models import ReportSet, Template, Report, Field
+from .models import ReportSet, Template, Field, Report
 from account.models import Group
 
 def form_horizontal():
@@ -41,4 +41,14 @@ class FieldForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FieldForm, self).__init__(*args, **kwargs)
+        self.helper = form_horizontal()
+
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ['name', 'method', 'templates']
+
+    def __init__(self, rspk, *args, **kwargs):
+        super(ReportForm, self).__init__(*args, **kwargs)
+        self.fields['templates'].queryset = Template.objects.filter(report_set=rspk)
         self.helper = form_horizontal()

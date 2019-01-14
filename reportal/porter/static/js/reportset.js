@@ -20,7 +20,8 @@ let table = $('#datatables').DataTable({
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-go" href="#">Go</a>' + 
+            '<a class="dropdown-item" id="btn-template" href="#">Templates</a>' + 
+            '<a class="dropdown-item" id="btn-report" href="#">Reports</a>' + 
             '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
             '<a class="dropdown-item" id="btn-delete" href="#">Delete</a>' +
             '</div></div>'
@@ -43,9 +44,12 @@ $('#datatables tbody').on('click', 'a', function () {
     id = data['id'];
 
     let id_name = $(this).attr("id");
-    if (id_name == 'btn-go') {
-        // GO button
+    if (id_name == 'btn-template') {
+        // REPORT button
         window.location = location.origin + '/template/' + id + '/'; 
+    } else if (id_name == 'btn-report') {
+        // TEMPLATE button
+        window.location = location.origin + '/report/' + id + '/';
     } else if (id_name == 'btn-edit') {
         // EDIT button
         $('#id_name').val(data['name']);
@@ -80,7 +84,7 @@ $('#confirm').on('click', '#delete', function (e) {
 
 $('#new').on('click', function (e) {
     $('#id_name').val('');
-    $('#id_group').val(1);
+    $('#id_group').val('');
     $('#modal-form').attr('action', '/reportset/');
     $('#modal_title').text('NEW');
     $("#myModal").modal();

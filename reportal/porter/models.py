@@ -1,5 +1,9 @@
 from django.db import models
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
+
+private_storage = FileSystemStorage(location=settings.PRIVATE_STORAGE_ROOT)
 
 # Create your models here.
 class ReportSet(models.Model):
@@ -28,12 +32,12 @@ class Template(models.Model):
 
 class Report(models.Model):
     name = models.CharField(max_length=200)
-    directory = models.TextField()
     UPLOAD_METHODS = (
-        ('APPEND', 'Append'),
         ('REPLACE', 'Replace'),
+        ('APPEND', 'Append'),
     )
-    method = models.CharField(max_length=20, choices=UPLOAD_METHODS)
+    method = models.CharField(max_length=20, choices=UPLOAD_METHODS, default='REPLACE')
+    templates = models.ManyToManyField(Template, related_name='reports')
     report_set = models.ForeignKey(ReportSet, on_delete=models.CASCADE, related_name='reports')
     last_modify_date = models.DateTimeField(auto_now=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True, null=True)
@@ -45,12 +49,11 @@ class Report(models.Model):
     def __str__(self):
         return self.name
 
-
 class Submission(models.Model):
     report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='submissions')
     template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='submissions')
-    uid = models.CharField(max_length=8) # used to download submissions
-    submitted_file = models.FileField(upload_to='not_used',null=True, blank=True)
+    uid = models.CharField(max_length=8, unique=True) # used to download submissions
+    upload = models.FileField(storage=private_storage, null=True)
     submitted_date = models.DateTimeField(auto_now=True, null=True)
     submitted_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='submissions')
     is_clean = models.BooleanField(default=False)

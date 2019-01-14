@@ -130,5 +130,7 @@ STATICFILES_DIRS = (
     '/var/www/static/',
 )
 
+PRIVATE_STORAGE_ROOT = os.path.join(BASE_DIR, 'private')
+
 DATE_FORMAT = '%m/%d/%Y'
 DATETIME_FORMAT = '%m/%d/%Y %I:%M'

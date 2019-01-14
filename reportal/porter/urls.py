@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register(r'reportset', views.ReportSetViewSet, base_name='reportset')
 router.register(r'template', views.TemplateViewSet, base_name='template')
 router.register(r'field', views.FieldViewSet, base_name='field')
+router.register(r'report', views.ReportViewSet, base_name='report')
 
 app_name = "porter"
 urlpatterns = [
@@ -19,4 +20,6 @@ urlpatterns = [
     path('template/<int:rspk>/<int:pk>/', views.templateIndex, name='template'),
     path('field/<int:rspk>/<int:tpk>/', views.fieldIndex, name='field'),
     path('field/<int:rspk>/<int:tpk>/<int:pk>/', views.fieldIndex, name='field'),
+    path('report/<int:rspk>/', views.reportIndex, name='report'),
+    path('report/<int:rspk>/<int:pk>/', views.reportIndex, name='report'),
 ]
