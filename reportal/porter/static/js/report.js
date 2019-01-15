@@ -25,10 +25,11 @@ let table = $('#datatables').DataTable({
         {"title": "id", "data": "id"},
         {"title": "name", "data": "name"},
         {"title": "method", "data": "method"},
-        {"title": "templates", "data": "templates"},
+        {"title": "templates", "data": "templates[, ].name"},
         {"title": "create_date", "data": "create_date"},
         {"title": "create_by", "data": "create_by.username"},
         {"title": "last_modify_date", "data": "last_modify_date"},
+        {"title": "template_ids", "data": "templates[, ].id"},
         {
             "title": "action", 
             "data": null,
@@ -41,6 +42,14 @@ let table = $('#datatables').DataTable({
             '</div></div>'
         }
     ],
+    "columnDefs": [
+        {
+            // hide Tempalte IDs
+            "targets": [ 7 ],
+            "visible": false,
+            "searchable": false
+        }
+    ]
 });
 
 let id = 0;
@@ -49,6 +58,10 @@ $('#datatables tbody').on('click', 'a', function () {
     let data = table.row($(this).parents('tr')).data();
     id = data['id'];
     console.log(data['templates']);
+    for (var i = 0; i < data['templates'].length; i++) {
+        data['templates'][i]['id'];
+        //Do something
+    }
     let id_name = $(this).attr("id");
     if (id_name == 'btn-go') {
         // GO button
@@ -57,7 +70,12 @@ $('#datatables tbody').on('click', 'a', function () {
         // EDIT button
         $('#id_name').val(data['name']);
         $('#id_method').val(data['method']);
-        $('#id_templates').val(data['templates']);
+        var template_ids = [];
+        var templates = data['templates'];
+        for (var i = 0; i < templates.length; i++) {
+            template_ids.push(templates[i]['id']);
+        }
+        $('#id_templates').val(template_ids);
         // bind item id to url
         $('#modal-form').attr('action', fp + id + '/');
         $('#myModal').modal();

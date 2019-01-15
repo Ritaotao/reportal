@@ -35,6 +35,7 @@ class FieldSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ReportSerializer(GenericMetaFieldMixin, serializers.ModelSerializer):
+    templates = TemplateSerializer(read_only=True, many=True)
     class Meta:
         model = Report
         fields = "__all__"

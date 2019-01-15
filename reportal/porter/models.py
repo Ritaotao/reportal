@@ -7,11 +7,14 @@ private_storage = FileSystemStorage(location=settings.PRIVATE_STORAGE_ROOT)
 
 # Create your models here.
 class ReportSet(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     group = models.ForeignKey('account.Group', default=1, on_delete=models.SET_DEFAULT, related_name='report_sets')
     last_modify_date = models.DateTimeField(auto_now=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True, null=True)
     create_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='report_sets')
+
+    class Meta:
+        unique_together = ('group', 'name',)
     
     def __str__(self):
         return self.name
