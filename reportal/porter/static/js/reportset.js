@@ -15,7 +15,7 @@ let table = $('#datatables').DataTable({
         {"title": "last_modify_date", "data": "last_modify_date"},
         {"title": "group_id", "data": "group.id"},
         {
-            "title": "action",
+            "title": "option",
             "data": null,
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 

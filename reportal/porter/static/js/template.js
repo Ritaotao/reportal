@@ -28,12 +28,13 @@ let table = $('#datatables').DataTable({
         {"title": "create_by", "data": "create_by.username"},
         {"title": "last_modify_date", "data": "last_modify_date"},
         {
-            "title": "action", 
+            "title": "option", 
             "data": null,
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-go" href="#">Fields</a>' + 
+            '<a class="dropdown-item" id="btn-field" href="#">Fields</a>' + 
+            '<a class="dropdown-item" id="btn-ruleset" href="#">Rule Sets</a>' + 
             '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
             '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
             '</div></div>'
@@ -48,9 +49,12 @@ $('#datatables tbody').on('click', 'a', function () {
     id = data['id'];
 
     let id_name = $(this).attr("id");
-    if (id_name == 'btn-go') {
-        // GO button
+    if (id_name == 'btn-field') {
+        // FIELD button
         window.location = location.origin + '/field/' + spk + '/' + id; 
+    } else if (id_name == 'btn-ruleset') {
+        // RULESET button
+        window.location = location.origin + '/ruleset/' + spk + '/' + id; 
     } else if (id_name == 'btn-edit') {
         // EDIT button
         $('#id_name').val(data['name']);

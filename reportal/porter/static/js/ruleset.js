@@ -14,7 +14,7 @@ if (url_array.length == 6) {
 
 console.log(spk, pk);
 // query_param for drf, form_param for form
-let current = '/field/'
+let current = '/ruleset/'
 let qp = '?template=' + spk;
 let fp = current + rspk + '/' + spk + '/';
 
@@ -26,8 +26,13 @@ let table = $('#datatables').DataTable({
     },
     "columns": [
         {"title": "id", "data": "id"},
-        {"title": "name", "data": "name"},
-        {"title": "data_type", "data": "dtype"},
+        {"title": "field", "data": "field.name"},
+        {"title": "rule", "data": "rule.name"},
+        {"title": "argument", "data": "argument"},
+        {"title": "action", "data": "action"},
+        {"title": "error_message", "data": "error_message"},
+        {"title": "field_id", "data": "field.id"},
+        {"title": "rule_id", "data": "rule.id"},
         {
             "title": "option", 
             "data": null,
@@ -39,6 +44,20 @@ let table = $('#datatables').DataTable({
             '</div></div>'
         }
     ],
+    "columnDefs": [
+        // hide ID columns
+        {
+            "targets": [ 6 ],
+            "visible": false,
+            "searchable": false
+        },
+        {
+            
+            "targets": [ 7 ],
+            "visible": false,
+            "searchable": false
+        }     
+    ]
 });
 
 let id = 0;
@@ -50,8 +69,11 @@ $('#datatables tbody').on('click', 'a', function () {
     let id_name = $(this).attr("id");
     if (id_name == 'btn-edit') {
         // EDIT button
-        $('#id_name').val(data['name']);
-        $('#id_dtype').val(data['dtype']);
+        $('#id_field').val(data['field']['id']);
+        $('#id_rule').val(data['rule']['id']);
+        $('#id_argument').val(data['argument']);
+        $('#id_action').val(data['action']);
+        $('#id_error_message').val(data['error_message']);
         // bind item id to url
         $('#modal-form').attr('action', fp + id + '/');
         $('#myModal').modal();
@@ -80,8 +102,11 @@ $('#confirm').on('click', '#delete', function (e) {
 });
 
 $('#new').on('click', function (e) {
-    $('#id_name').val('');
-    $('#id_dtype').val('');
+    $('#id_field').val('');
+    $('#id_rule').val('');
+    $('#id_argument').val('');
+    $('#id_action').val('');
+    $('#id_error_message').val('');
     $('#modal-form').attr('action', fp);
     $('#modal_title').text('NEW');
     $("#myModal").modal();

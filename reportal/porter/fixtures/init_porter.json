@@ -1,0 +1,47 @@
+[
+    {
+      "model": "porter.rule",
+      "pk": 1,
+      "fields": {
+        "name": "Unrecognized Value",
+        "description": "Check if there are extra items in the column not present in the argument list",
+        "has_argument": true
+      }
+    },
+    {
+        "model": "porter.rule",
+        "pk": 2,
+        "fields": {
+          "name": "Greater Equal Than",
+          "description": "Check if all values in a numeric or date column are greater and equal than threshold argument",
+          "has_argument": true
+        }
+    },
+    {
+        "model": "porter.rule",
+        "pk": 3,
+        "fields": {
+          "name": "Less Equal Than",
+          "description": "Check if all values in a numeric or date column are less and equal than threshold argument",
+          "has_argument": true
+        }
+    },
+    {
+        "model": "porter.rule",
+        "pk": 4,
+        "fields": {
+          "name": "Count Underscores",
+          "description": "Check if a column has matched number of underscores",
+          "has_argument": true
+        }
+    },
+    {
+      "model": "porter.rule",
+      "pk": 5,
+      "fields": {
+        "name": "Match Regular Expression",
+        "description": "Check if a column format matches a regular expression",
+        "has_argument": true
+      }
+    }
+]

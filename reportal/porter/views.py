@@ -1,17 +1,17 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.http.response import HttpResponse
-from django.urls import reverse
-from django.views import View
-from .models import ReportSet, Template, Submission, Field, Report
-from account.models import Group, User, Profile
-from .forms import ReportSetForm, TemplateForm, FieldForm, ReportForm
 from django.template.response import TemplateResponse
+from .models import ReportSet, Template, Submission, Field, RuleSet, Report
+from account.models import Group
+from .forms import ReportSetForm, TemplateForm, FieldForm, FieldImportForm, RuleSetForm, ReportForm
+from django.contrib import messages
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 # from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .serializers import ReportSetSerializer, TemplateSerializer, FieldSerializer, ReportSerializer
+from .serializers import ReportSetSerializer, TemplateSerializer, FieldSerializer, RuleSetSerializer, ReportSerializer
 
+from io import StringIO
+import csv
 import random
 
 # utility functions
@@ -78,15 +78,37 @@ class TemplateViewSet(viewsets.ModelViewSet):
 
 def fieldIndex(request, rspk, tpk, pk=None):
     """render form and form validation,
-        template.js controls form action and adds parameters to url"""
+        field.js controls form action and adds parameters to url"""
     scope = 'field'
-    instance = get_object_or_404(Field, pk=pk) if pk else None
-    form = FieldForm(request.POST or None, instance=instance)
-    if form.is_valid():
-        obj = form.save(commit=False)
-        obj.template_id = tpk
-        obj.save()
-    html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope, 'rspk': rspk})
+    form = FieldForm()
+    importform = FieldImportForm()
+    if request.method == 'POST':
+        if 'btn_new' in request.POST:
+            instance = get_object_or_404(Field, pk=pk) if pk else None
+            form = FieldForm(request.POST, instance=instance)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                obj.template_id = tpk
+                obj.save()
+        elif 'btn_import' in request.POST:
+            importform = FieldImportForm(request.POST, request.FILES)
+            if importform.is_valid():
+                csvf = StringIO(request.FILES['docfile'].read().decode())
+                reader = csv.reader(csvf, delimiter=",")
+                next(reader) # always skip row 1 as header
+                for row in reader:
+                    try:
+                        new_field, created = Field.objects.get_or_create(name=row[0], dtype=row[1].upper(), template_id=tpk)
+                        if created:
+                            new_field.save()
+                    except Exception as e:
+                        messages.error(request, 'Can not parse row: {}. {}'.format(row, e))
+            else:
+                messages.error(request, 'Please submit a valid csv file')
+    context =  {
+        'form': form, 'importform': importform, 'scope': scope, 'rspk': rspk, 'tpk': tpk
+    }
+    html = TemplateResponse(request, 'porter/create.html', context)
     return HttpResponse(html.render())
 
 class FieldViewSet(viewsets.ModelViewSet):
@@ -99,6 +121,30 @@ class FieldViewSet(viewsets.ModelViewSet):
         template = self.request.query_params.get('template', None)
         if template is not None:
             queryset = queryset.filter(template__id=template)
+        return queryset
+
+def rulesetIndex(request, rspk, tpk, pk=None):
+    """render form and form validation,
+        ruleset.js controls form action and adds parameters to url"""
+    scope = 'ruleset'
+    instance = get_object_or_404(RuleSet, pk=pk) if pk else None
+    form = RuleSetForm(tpk, request.POST or None, instance=instance)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+    html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope, 'rspk': rspk, 'tpk': tpk})
+    return HttpResponse(html.render())
+
+class RuleSetViewSet(viewsets.ModelViewSet):
+    """drf to datatable, filter qs"""
+    serializer_class = RuleSetSerializer
+
+    def get_queryset(self):
+        groups = Group.objects.filter(profiles__user=self.request.user)
+        queryset = RuleSet.objects.filter(field__template__report_set__group__in=groups)
+        template = self.request.query_params.get('template', None)
+        if template is not None:
+            queryset = queryset.filter(field__template__id=template)
         return queryset
 
 def reportIndex(request, rspk, pk=None):

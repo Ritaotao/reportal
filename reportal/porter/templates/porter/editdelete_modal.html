@@ -1,6 +1,6 @@
-{% load crispy_forms_tags %}   
-   <!-- NEW and EDIT modal -->
-   <div class="modal fade" id="myModal" role="dialog">
+{% load crispy_forms_tags %}
+<!-- NEW and EDIT modal -->
+<div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
@@ -13,8 +13,7 @@
                <form method="POST" action="" enctype='multipart/form-data' id='modal-form'>
                         {% csrf_token %}
                         {% crispy form %}
-                        <input type="hidden" id="type" name="type" value="">
-                        <button type="submit" class="btn btn-success btn-block">
+                        <button type="submit" name="btn_new" class="btn btn-success btn-block">
                             <span class="glyphicon glyphicon-ok"></span> OK
                         </button>
                 </form>
@@ -38,6 +37,31 @@
         </div>
     </div>
 </div>
+
+{% if scope == 'field' %}
+<!-- Import modal -->
+<div class="modal fade" id="importModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                    <h4 class="modal-title" id="import_modal_title"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    
+            </div>
+            <div class="modal-body">
+               <form method="POST" action="{% url 'porter:field' rspk=rspk tpk=tpk %}" enctype='multipart/form-data' id='import-modal-form'>
+                    {% csrf_token %}
+                    {% crispy importform %}
+                    <button type="submit" name="btn_import" class="btn btn-success btn-block">
+                        <span class="glyphicon glyphicon-ok"></span> OK
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 {% if form.errors  %}
 <script type="text/javascript">

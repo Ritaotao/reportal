@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ReportSet, Report, Template, Submission, Field, Rule, Quality
+from .models import ReportSet, Report, Template, Submission, Field, Rule, RuleSet
 
 # Register your models here.
 @admin.register(ReportSet)
@@ -13,3 +13,6 @@ class ReportAdmin(admin.ModelAdmin):
 admin.site.register(Template)
 admin.site.register(Field)
 
+@admin.register(Rule)
+class RuleAdmin(admin.ModelAdmin):
+    list_display=('id','name','description','has_argument')

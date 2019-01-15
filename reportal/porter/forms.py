@@ -1,7 +1,7 @@
 from django import forms
+from django.core.validators import FileExtensionValidator
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
-from .models import ReportSet, Template, Field, Report
+from .models import ReportSet, Template, Field, RuleSet, Report
 from account.models import Group
 
 def form_horizontal():
@@ -41,6 +41,28 @@ class FieldForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FieldForm, self).__init__(*args, **kwargs)
+        self.helper = form_horizontal()
+
+class FieldImportForm(forms.Form):
+    docfile = forms.FileField(
+        widget=forms.FileInput(attrs={'accept': ".csv"}),
+        label='Select a file',
+        help_text='max. 42 meabytes',
+        validators = [FileExtensionValidator(allowed_extensions=['csv'])]
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(FieldImportForm, self).__init__(*args, **kwargs)
+        self.helper = form_horizontal()
+
+class RuleSetForm(forms.ModelForm):
+    class Meta:
+        model = RuleSet
+        fields = ['field', 'rule', 'argument', 'action', 'error_message']
+
+    def __init__(self, tpk, *args, **kwargs):
+        super(RuleSetForm, self).__init__(*args, **kwargs)
+        self.fields['field'].queryset = Field.objects.filter(template=tpk)
         self.helper = form_horizontal()
 
 class ReportForm(forms.ModelForm):
