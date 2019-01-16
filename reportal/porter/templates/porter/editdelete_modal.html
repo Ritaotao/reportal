@@ -38,6 +38,23 @@
     </div>
 </div>
 
+{% if scope == 'template' %}
+<!-- Duplicate Modal -->
+<div class="modal fade" id="duplicateModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure? All related fields and rulesets will be duplicated as well</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="duplicate">Duplicate</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% if scope == 'field' %}
 <!-- Import modal -->
 <div class="modal fade" id="importModal" role="dialog">

@@ -64,6 +64,10 @@ def templateIndex(request, rspk, pk=None):
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
+def templateDuplicate(request, rspk, pk):
+    pass
+
+
 class TemplateViewSet(viewsets.ModelViewSet):
     """drf to datatable, filter qs"""
     serializer_class = TemplateSerializer
@@ -83,14 +87,8 @@ def fieldIndex(request, rspk, tpk, pk=None):
     form = FieldForm()
     importform = FieldImportForm()
     if request.method == 'POST':
-        if 'btn_new' in request.POST:
-            instance = get_object_or_404(Field, pk=pk) if pk else None
-            form = FieldForm(request.POST, instance=instance)
-            if form.is_valid():
-                obj = form.save(commit=False)
-                obj.template_id = tpk
-                obj.save()
-        elif 'btn_import' in request.POST:
+        # import post method
+        if 'btn_import' in request.POST:
             importform = FieldImportForm(request.POST, request.FILES)
             if importform.is_valid():
                 csvf = StringIO(request.FILES['docfile'].read().decode())
@@ -105,6 +103,14 @@ def fieldIndex(request, rspk, tpk, pk=None):
                         messages.error(request, 'Can not parse row: {}. {}'.format(row, e))
             else:
                 messages.error(request, 'Please submit a valid csv file')
+        # create and edit post method
+        else:
+            instance = get_object_or_404(Field, pk=pk) if pk else None
+            form = FieldForm(request.POST, instance=instance)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                obj.template_id = tpk
+                obj.save()
     context =  {
         'form': form, 'importform': importform, 'scope': scope, 'rspk': rspk, 'tpk': tpk
     }

@@ -59,6 +59,10 @@ class RuleSetForm(forms.ModelForm):
     class Meta:
         model = RuleSet
         fields = ['field', 'rule', 'argument', 'action', 'error_message']
+        help_texts = {
+            'argument': 'if multiple arguments, seperated by comma(,); date argument format: 2019-01-01',
+            'action': 'Warning: flagged but submission will be accepted; Error: submission will be rejected',
+        }
 
     def __init__(self, tpk, *args, **kwargs):
         super(RuleSetForm, self).__init__(*args, **kwargs)

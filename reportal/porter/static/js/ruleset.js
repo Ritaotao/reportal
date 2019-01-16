@@ -40,6 +40,7 @@ let table = $('#datatables').DataTable({
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
             '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
+            '<a class="dropdown-item" id="btn-duplicate" href="#">Duplicate</a>' + 
             '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
             '</div></div>'
         }
@@ -77,6 +78,16 @@ $('#datatables tbody').on('click', 'a', function () {
         // bind item id to url
         $('#modal-form').attr('action', fp + id + '/');
         $('#myModal').modal();
+    } else if (id_name == 'btn-duplicate') {
+        // DUPLICATE button
+        $('#id_field').val(data['field']['id']);
+        $('#id_rule').val(data['rule']['id']);
+        $('#id_argument').val(data['argument']);
+        $('#id_action').val(data['action']);
+        $('#id_error_message').val(data['error_message']);
+        // do not bind item id to create a new record with same values
+        $('#modal-form').attr('action', fp);
+        $('#modal-form').submit();        
     } else {
     // DELETE button
     $('#modal_title').text('DELETE');

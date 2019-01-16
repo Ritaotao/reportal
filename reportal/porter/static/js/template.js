@@ -36,6 +36,7 @@ let table = $('#datatables').DataTable({
             '<a class="dropdown-item" id="btn-field" href="#">Fields</a>' + 
             '<a class="dropdown-item" id="btn-ruleset" href="#">Rule Sets</a>' + 
             '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
+            '<a class="dropdown-item" id="btn-duplicate" href="#">Duplicate</a>' + 
             '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
             '</div></div>'
         }
@@ -61,10 +62,14 @@ $('#datatables tbody').on('click', 'a', function () {
         // bind item id to url
         $('#modal-form').attr('action', fp + id + '/');
         $('#myModal').modal();
+    } else if (id_name == 'btn-duplicate') {
+        //DUPLICATE button
+        $('#modal_title').text('DUPLICATE');
+        $('#duplicateModal').modal();
     } else {
-    // DELETE button
-    $('#modal_title').text('DELETE');
-    $('#confirm').modal();
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $('#confirm').modal();
     }
 });
 

@@ -12,7 +12,6 @@ DATA_TYPES = (
 )
 
 ACTIONS = (
-    ('SAFE', 'Safe'),
     ('WARNING', 'Warning'),
     ('ERROR', 'Error'),
 )
