@@ -61,7 +61,7 @@ class Submission(models.Model):
 
 class Field(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='fields')
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     dtype = models.CharField(max_length=20, choices=DATA_TYPES)
     def __str__(self):
         return self.name

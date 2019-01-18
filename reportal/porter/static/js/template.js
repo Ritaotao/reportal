@@ -60,6 +60,7 @@ $('#datatables tbody').on('click', 'a', function () {
         // EDIT button
         $('#id_name').val(data['name']);
         // bind item id to url
+        $('#modal_title').text('EDIT');
         $('#modal-form').attr('action', fp + id + '/');
         $('#myModal').modal();
     } else if (id_name == 'btn-duplicate') {
@@ -88,6 +89,10 @@ $('#confirm').on('click', '#delete', function (e) {
             console.log(jqXHR);
         },
     });
+});
+
+$('#duplicate').on('click', function (e) {
+    window.location = location.origin + fp + id + '/duplicate/'; 
 });
 
 $('#new').on('click', function (e) {

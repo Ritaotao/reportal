@@ -2,7 +2,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
 from .models import ReportSet, Template, Submission, Field, RuleSet, Report
-from account.models import Group
+from account.models import Group, Profile
 from .forms import ReportSetForm, TemplateForm, FieldForm, FieldImportForm, RuleSetForm, ReportForm
 from django.contrib import messages
 
@@ -24,11 +24,12 @@ def genUid():
 
 # Create your views here.
 # create portal
-## Step 1: create a new report set or use an existing one
 
 def reportsetIndex(request, pk=None):
-    """render form and form validation,
-        reportset.js controls form action and adds parameters to url"""
+    '''
+        render form and form validation,
+        reportset.js controls form action and adds parameters to url
+    '''
     scope = 'reportset'
     instance = get_object_or_404(ReportSet, pk=pk) if pk else None
     form = ReportSetForm(request.user, request.POST or None, instance=instance)
@@ -41,16 +42,20 @@ def reportsetIndex(request, pk=None):
     return HttpResponse(html.render())
 
 class ReportSetViewSet(viewsets.ModelViewSet):
-    """drf to datatable, filter qs"""
+    '''
+        drf to datatable, filter qs
+    '''
     serializer_class = ReportSetSerializer
 
     def get_queryset(self):
-        groups = Group.objects.filter(profiles__user=self.request.user)
+        groups = Profile.objects.get(user=self.request.user).groups.all()
         return ReportSet.objects.filter(group__in=groups)
 
 def templateIndex(request, rspk, pk=None):
-    """render form and form validation,
-        template.js controls form action and adds parameters to url"""
+    '''
+        render form and form validation,
+        template.js controls form action and adds parameters to url
+    '''
     scope = 'template'
     instance = get_object_or_404(Template, pk=pk) if pk else None
     form = TemplateForm(request.POST or None, instance=instance)
@@ -65,24 +70,48 @@ def templateIndex(request, rspk, pk=None):
     return HttpResponse(html.render())
 
 def templateDuplicate(request, rspk, pk):
-    pass
+    '''
+        Duplicate template and nested fields and rulesets
+    '''
+    # save template
+    template = get_object_or_404(Template, pk=pk)
+    template.pk = None
+    template.name = template.name + '_v2' # to avoid duplicate of reportset - template pair
+    template.uid = genUid()
+    template.save()
+    # save fields and rulesets
+    fields = Field.objects.filter(template__id=pk).all()
+    for field in fields:
+        rulesets = RuleSet.objects.filter(field__id=field.pk).all()
+        field.pk = None
+        field.template_id = template.pk
+        field.save()
+        for ruleset in rulesets:
+            ruleset.pk = None
+            ruleset.field_id = field.pk
+            ruleset.save()
+    return redirect("porter:template", rspk=rspk)
 
 
 class TemplateViewSet(viewsets.ModelViewSet):
-    """drf to datatable, filter qs"""
+    '''
+        drf to datatable, filter qs
+    '''
     serializer_class = TemplateSerializer
 
     def get_queryset(self):
-        groups = Group.objects.filter(profiles__user=self.request.user)
-        queryset = Template.objects.filter(report_set__group__in=groups)
+        queryset = Template.objects.all()
         report_set = self.request.query_params.get('report_set', None)
         if report_set is not None:
             queryset = queryset.filter(report_set__id=report_set)
-        return queryset
+        groups = Profile.objects.get(user=self.request.user).groups.all()
+        return queryset.filter(report_set__group__in=groups)
 
 def fieldIndex(request, rspk, tpk, pk=None):
-    """render form and form validation,
-        field.js controls form action and adds parameters to url"""
+    '''
+        render form and form validation,
+        field.js controls form action and adds parameters to url
+    '''
     scope = 'field'
     form = FieldForm()
     importform = FieldImportForm()
@@ -118,20 +147,24 @@ def fieldIndex(request, rspk, tpk, pk=None):
     return HttpResponse(html.render())
 
 class FieldViewSet(viewsets.ModelViewSet):
-    """drf to datatable, filter qs"""
+    '''
+        drf to datatable, filter qs
+    '''
     serializer_class = FieldSerializer
 
     def get_queryset(self):
-        groups = Group.objects.filter(profiles__user=self.request.user)
-        queryset = Field.objects.filter(template__report_set__group__in=groups)
+        queryset = Field.objects.all()
         template = self.request.query_params.get('template', None)
         if template is not None:
             queryset = queryset.filter(template__id=template)
-        return queryset
+        groups = Profile.objects.get(user=self.request.user).groups.all()
+        return queryset.filter(template__report_set__group__in=groups)
 
 def rulesetIndex(request, rspk, tpk, pk=None):
-    """render form and form validation,
-        ruleset.js controls form action and adds parameters to url"""
+    '''
+        render form and form validation,
+        ruleset.js controls form action and adds parameters to url
+    '''   
     scope = 'ruleset'
     instance = get_object_or_404(RuleSet, pk=pk) if pk else None
     form = RuleSetForm(tpk, request.POST or None, instance=instance)
@@ -142,20 +175,24 @@ def rulesetIndex(request, rspk, tpk, pk=None):
     return HttpResponse(html.render())
 
 class RuleSetViewSet(viewsets.ModelViewSet):
-    """drf to datatable, filter qs"""
+    '''
+        drf to datatable, filter qs
+    '''
     serializer_class = RuleSetSerializer
 
     def get_queryset(self):
-        groups = Group.objects.filter(profiles__user=self.request.user)
-        queryset = RuleSet.objects.filter(field__template__report_set__group__in=groups)
+        queryset = RuleSet.objects.all()
         template = self.request.query_params.get('template', None)
         if template is not None:
             queryset = queryset.filter(field__template__id=template)
-        return queryset
+        groups = Profile.objects.get(user=self.request.user).groups.all()
+        return queryset.filter(field__template__report_set__group__in=groups)
 
 def reportIndex(request, rspk, pk=None):
-    """render form and form validation,
-        report.js controls form action and adds parameters to url"""
+    '''
+        render form and form validation,
+        report.js controls form action and adds parameters to url
+    '''
     scope = 'report'
     instance = get_object_or_404(Report, pk=pk) if pk else None
     form = ReportForm(rspk, request.POST or None, instance=instance)
@@ -170,13 +207,15 @@ def reportIndex(request, rspk, pk=None):
     return HttpResponse(html.render())
 
 class ReportViewSet(viewsets.ModelViewSet):
-    """drf to datatable, filter qs"""
+    '''
+        drf to datatable, filter qs
+    '''
     serializer_class = ReportSerializer
 
     def get_queryset(self):
-        groups = Group.objects.filter(profiles__user=self.request.user)
-        queryset = Report.objects.filter(report_set__group__in=groups)
+        queryset = Report.objects.all()
         report_set = self.request.query_params.get('report_set', None)
         if report_set is not None:
             queryset = queryset.filter(report_set__id=report_set)
-        return queryset
+        groups = Profile.objects.get(user=self.request.user).groups.all()
+        return queryset.filter(report_set__group__in=groups)

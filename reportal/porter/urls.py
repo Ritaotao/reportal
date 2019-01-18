@@ -19,6 +19,7 @@ urlpatterns = [
     path('reportset/<int:pk>/', views.reportsetIndex, name='reportset_edit'),
     path('template/<int:rspk>/', views.templateIndex, name='template'),
     path('template/<int:rspk>/<int:pk>/', views.templateIndex, name='template_edit'),
+    path('template/<int:rspk>/<int:pk>/duplicate/', views.templateDuplicate, name='template_duplicate'),
     path('field/<int:rspk>/<int:tpk>/', views.fieldIndex, name='field'),
     path('field/<int:rspk>/<int:tpk>/<int:pk>/', views.fieldIndex, name='field_edit'),
     path('ruleset/<int:rspk>/<int:tpk>/', views.rulesetIndex, name='ruleset'),
