@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import ReportSet, Template, Field, Report, Rule, RuleSet
+from .models import ReportSet, Template, Field, Report, Rule, RuleSet, Submission
 from account.models import Group, User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -35,6 +35,7 @@ class FieldSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ReportSerializer(GenericMetaFieldMixin, serializers.ModelSerializer):
+    report_set = ReportSetSerializer()
     templates = TemplateSerializer(read_only=True, many=True)
     class Meta:
         model = Report
@@ -52,3 +53,13 @@ class RuleSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = RuleSet
         fields = "__all__"
+
+class SubmissionSerializer(serializers.ModelSerializer):
+    report = ReportSerializer()
+    template = TemplateSerializer()
+    submitted_date = serializers.DateTimeField(format=settings.DATETIME_FORMAT, required=False)
+    submitted_by = UserSerializer()
+
+    class Meta:
+        model = Submission
+        fields = "__all__"  

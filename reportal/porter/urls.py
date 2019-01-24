@@ -9,12 +9,13 @@ router.register(r'template', views.TemplateViewSet, base_name='template')
 router.register(r'field', views.FieldViewSet, base_name='field')
 router.register(r'report', views.ReportViewSet, base_name='report')
 router.register(r'ruleset', views.RuleSetViewSet, base_name='ruleset')
+router.register(r'submission', views.SubmissionViewSet, base_name='submission')
 
 app_name = "porter"
 urlpatterns = [
     re_path(r'^api/', include(router.urls)),
     #re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # 2 urls each, one for get list view, one for form post action
+    # create url: 2 urls each, one for get list view, one for form post action
     path('reportset/', views.reportsetIndex, name='reportset'),
     path('reportset/<int:pk>/', views.reportsetIndex, name='reportset_edit'),
     path('template/<int:rspk>/', views.templateIndex, name='template'),
@@ -26,4 +27,7 @@ urlpatterns = [
     path('ruleset/<int:rspk>/<int:tpk>/<int:pk>/', views.rulesetIndex, name='ruleset_edit'),
     path('report/<int:rspk>/', views.reportIndex, name='report'),
     path('report/<int:rspk>/<int:pk>/', views.reportIndex, name='report_edit'),
+    # submit url
+    path('list/', views.listIndex, name='list'),
+    path('submission/<int:rpk>/', views.submissionIndex, name='submission'),
 ]

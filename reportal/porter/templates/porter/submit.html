@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    <div class="flex">
+        <div class="left"><a id="previous" href="#" class="previous">&laquo; Previous</a></div>
+        {% if scope != 'list' %}
+        <div class="right"><button type="button" data-dismiss="modal" class="btn btn-info btn-sm" id="new">+</button></div>
+        {% endif %}
+      </div>
+
+    <!-- datatables, js renders thead and tbody-->
+    <table id="datatables" class="table table-hover"></table>
+
+{% if scope != 'list' %}
+    {% include 'porter/editdelete_modal.html' %}
+{% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+    <!-- use scope variable from view to dynamically determine js file -->
+    <script src="{% static 'js/'|add:scope|add:'.js' %}"></script>
+{% endblock %}

@@ -36,7 +36,7 @@ let table = $('#datatables').DataTable({
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-go" href="#">Detail</a>' + 
+            '<a class="dropdown-item" id="btn-go" href="#">Duplicate</a>' + 
             '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
             '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
             '</div></div>'

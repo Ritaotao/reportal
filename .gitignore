@@ -9,6 +9,7 @@ db.sqlite3
 
 # additional files
 data/
+private/
 
 # C extensions
 *.so

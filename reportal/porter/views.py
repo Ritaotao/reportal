@@ -3,13 +3,16 @@ from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
 from .models import ReportSet, Template, Submission, Field, RuleSet, Report
 from account.models import Group, Profile
-from .forms import ReportSetForm, TemplateForm, FieldForm, FieldImportForm, RuleSetForm, ReportForm
+from .forms import ReportSetForm, TemplateForm, FieldForm, FieldImportForm, RuleSetForm, ReportForm, SubmissionForm
 from django.contrib import messages
+from django.conf import settings
 
 from rest_framework import viewsets
 # from rest_framework.permissions import IsAuthenticated
-from .serializers import ReportSetSerializer, TemplateSerializer, FieldSerializer, RuleSetSerializer, ReportSerializer
+from .serializers import (ReportSetSerializer, TemplateSerializer, FieldSerializer, RuleSetSerializer, 
+    ReportSerializer, SubmissionSerializer)
 
+import os
 from io import StringIO
 import csv
 import random
@@ -203,6 +206,13 @@ def reportIndex(request, rspk, pk=None):
             obj.create_by = request.user
         obj.save()
         form.save_m2m()
+        # create save directory for group - report set - report
+        gpath = os.path.join(settings.PRIVATE_STORAGE_ROOT, obj.report_set.group.name)
+        rspath = os.path.join(gpath, obj.report_set.name)
+        rpath = os.path.join(rspath, obj.name)
+        for p in [gpath, rspath, rpath]:
+            if not os.path.exists(p):
+                os.makedirs(p)
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
@@ -219,3 +229,43 @@ class ReportViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(report_set__id=report_set)
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(report_set__group__in=groups)
+
+# submit portal
+def listIndex(request):
+    '''
+        render form and form validation,
+        list.js show reportViewSet list for data table
+    '''
+    scope = 'list'
+    html = TemplateResponse(request, 'porter/submit.html', {'scope': scope})
+    return HttpResponse(html.render())
+
+def submissionIndex(request, rpk):
+    '''
+        render form and form validation,
+        submission.js controls form action and adds parameters to url
+    '''
+    scope = 'submission'
+    form = SubmissionForm(rpk, request.POST or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        print("valid: {}".format(obj))
+        #if not pk:
+        #    obj.create_by = request.user
+        #obj.save()
+    html = TemplateResponse(request, 'porter/submit.html', {'form': form, 'scope': scope})
+    return HttpResponse(html.render())
+
+class SubmissionViewSet(viewsets.ModelViewSet):
+    '''
+        drf to datatable, filter qs
+    '''
+    serializer_class = SubmissionSerializer
+
+    def get_queryset(self):
+        queryset = Submission.objects.all()
+        report = self.request.query_params.get('report', None)
+        if report is not None:
+            queryset = queryset.filter(report__id=report)
+        groups = Profile.objects.get(user=self.request.user).groups.all()
+        return queryset.filter(report__report_set__group__in=groups)

@@ -1,8 +1,8 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
 from crispy_forms.helper import FormHelper
-from .models import ReportSet, Template, Field, RuleSet, Report
-from account.models import Group
+from .models import ReportSet, Template, Field, RuleSet, Report, Submission
+from account.models import Group, Profile
 
 def form_horizontal():
     helper = FormHelper()
@@ -77,4 +77,14 @@ class ReportForm(forms.ModelForm):
     def __init__(self, rspk, *args, **kwargs):
         super(ReportForm, self).__init__(*args, **kwargs)
         self.fields['templates'].queryset = Template.objects.filter(report_set=rspk)
+        self.helper = form_horizontal()
+
+class SubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Submission
+        fields = ['template', 'upload']
+
+    def __init__(self, rpk, *args, **kwargs):
+        super(SubmissionForm, self).__init__(*args, **kwargs)
+        self.fields['template'].queryset = Template.objects.filter(reports__id=rpk)
         self.helper = form_horizontal()
