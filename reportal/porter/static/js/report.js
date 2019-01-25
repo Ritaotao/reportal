@@ -36,7 +36,7 @@ let table = $('#datatables').DataTable({
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
             '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-go" href="#">Duplicate</a>' + 
+            '<a class="dropdown-item" id="btn-dup" href="#">Duplicate</a>' + 
             '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
             '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
             '</div></div>'
@@ -57,32 +57,33 @@ let id = 0;
 $('#datatables tbody').on('click', 'a', function () {
     let data = table.row($(this).parents('tr')).data();
     id = data['id'];
-    console.log(data['templates']);
-    for (var i = 0; i < data['templates'].length; i++) {
-        data['templates'][i]['id'];
-        //Do something
-    }
+
     let id_name = $(this).attr("id");
-    if (id_name == 'btn-go') {
-        // GO button
-        // window.location = location.origin + '/quality/' + spk + '/' + id; 
-    } else if (id_name == 'btn-edit') {
-        // EDIT button
-        $('#id_name').val(data['name']);
-        $('#id_method').val(data['method']);
+    if (id_name == 'btn-delete') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $('#confirm').modal();
+    } else {
+        // get template ids for manytomany field
         var template_ids = [];
         var templates = data['templates'];
         for (var i = 0; i < templates.length; i++) {
             template_ids.push(templates[i]['id']);
         }
-        $('#id_templates').val(template_ids);
-        // bind item id to url
-        $('#modal-form').attr('action', fp + id + '/');
-        $('#myModal').modal();
-    } else {
-    // DELETE button
-    $('#modal_title').text('DELETE');
-    $('#confirm').modal();
+        // fill form  
+        $('#id_method').val(data['method']);
+        $('#id_templates').val(template_ids);   
+        if (id_name == 'btn-edit') {
+            // edit: bind pk to url
+            $('#id_name').val(data['name']);
+            $('#modal-form').attr('action', fp + id + '/');
+            $('#myModal').modal();
+        } else {
+            // duplicate: submit form without id
+            $('#id_name').val(data['name']+'_2');
+            $('#modal-form').attr('action', fp);
+            $('#modal-form').submit();
+        }
     }
 });
 

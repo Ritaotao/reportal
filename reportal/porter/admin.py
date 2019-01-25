@@ -16,3 +16,7 @@ admin.site.register(Field)
 @admin.register(Rule)
 class RuleAdmin(admin.ModelAdmin):
     list_display=('id','name','description','has_argument')
+
+@admin.register(Submission)
+class SubmissionAdmin(admin.ModelAdmin):
+    list_display=('id','report','template','uid','upload','submitted_date','submitted_by', 'is_clean')

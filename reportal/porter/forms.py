@@ -46,7 +46,7 @@ class FieldForm(forms.ModelForm):
 class FieldImportForm(forms.Form):
     docfile = forms.FileField(
         widget=forms.FileInput(attrs={'accept': ".csv"}),
-        label='Select a file',
+        label='Upload',
         help_text='max. 42 meabytes',
         validators = [FileExtensionValidator(allowed_extensions=['csv'])]
     )
@@ -87,4 +87,7 @@ class SubmissionForm(forms.ModelForm):
     def __init__(self, rpk, *args, **kwargs):
         super(SubmissionForm, self).__init__(*args, **kwargs)
         self.fields['template'].queryset = Template.objects.filter(reports__id=rpk)
+        self.fields['upload'].widget = forms.FileInput(attrs={'accept': ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
+        self.fields['upload'].help_text = 'csv/xlsx only'
+        self.fields['upload'].validators = [FileExtensionValidator(allowed_extensions=['csv', 'xlsx'])]
         self.helper = form_horizontal()

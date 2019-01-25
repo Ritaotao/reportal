@@ -50,15 +50,6 @@ class Report(models.Model):
     def __str__(self):
         return self.name
 
-class Submission(models.Model):
-    report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='submissions')
-    template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='submissions')
-    uid = models.CharField(max_length=8, unique=True) # used to download submissions
-    upload = models.FileField(storage=private_storage, null=True)
-    submitted_date = models.DateTimeField(auto_now=True, null=True)
-    submitted_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='submissions')
-    is_clean = models.BooleanField(default=False)
-
 class Field(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='fields')
     name = models.CharField(max_length=200)
@@ -82,10 +73,26 @@ class Rule(models.Model):
     def __str__(self):
         return self.name
 
-# Quality is a set of rules
 class RuleSet(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name='rule_sets')
     rule = models.ForeignKey(Rule, on_delete=models.CASCADE, related_name='rule_sets')
     action = models.CharField(max_length=20, choices=ACTIONS)
     argument = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
+
+def upload_directory_path(instance, filename):
+    # file will be uploaded to private/<group_name>/<report_set_name>/<report_name>/<template_name>/<file_name>
+    group = instance.report.report_set.group.name
+    report_set = instance.report.report_set.name
+    report = instance.report.name
+    template = instance.template.name
+    return "{0}/{1}/{2}/{3}/{4}".format(group, report_set, report, template, filename)
+
+class Submission(models.Model):
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='submissions')
+    template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='submissions')
+    uid = models.CharField(max_length=8, unique=True) # used to download submissions
+    upload = models.FileField(upload_to=upload_directory_path, storage=private_storage, null=True)
+    submitted_date = models.DateTimeField(auto_now=True, null=True)
+    submitted_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='submissions')
+    is_clean = models.BooleanField(default=False)

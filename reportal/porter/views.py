@@ -16,6 +16,7 @@ import os
 from io import StringIO
 import csv
 import random
+from .quality import check_quality
 
 # utility functions
 def genUid():
@@ -206,13 +207,6 @@ def reportIndex(request, rspk, pk=None):
             obj.create_by = request.user
         obj.save()
         form.save_m2m()
-        # create save directory for group - report set - report
-        gpath = os.path.join(settings.PRIVATE_STORAGE_ROOT, obj.report_set.group.name)
-        rspath = os.path.join(gpath, obj.report_set.name)
-        rpath = os.path.join(rspath, obj.name)
-        for p in [gpath, rspath, rpath]:
-            if not os.path.exists(p):
-                os.makedirs(p)
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
@@ -246,13 +240,48 @@ def submissionIndex(request, rpk):
         submission.js controls form action and adds parameters to url
     '''
     scope = 'submission'
-    form = SubmissionForm(rpk, request.POST or None)
-    if form.is_valid():
-        obj = form.save(commit=False)
-        print("valid: {}".format(obj))
-        #if not pk:
-        #    obj.create_by = request.user
-        #obj.save()
+    form = SubmissionForm(rpk, request.POST or None, request.FILES or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            # handle_uploaded_files(request.FILES['upload'], template_id)
+            check_quality(request.FILES['upload'], 1)
+            obj = form.save(commit=False)
+            obj.report_id = rpk
+            obj.uid = genUid()
+            obj.submitted_by = request.user
+            obj.is_clean = False        
+            #obj.save()
+        else:
+            messages.error(request, 'Please submit a valid xlsx or csv file')
+    """  
+    form = FieldForm()
+    importform = FieldImportForm()
+    if request.method == 'POST':
+        # import post method
+        if 'btn_import' in request.POST:
+            importform = FieldImportForm(request.POST, request.FILES)
+            if importform.is_valid():
+                csvf = StringIO(request.FILES['docfile'].read().decode())
+                reader = csv.reader(csvf, delimiter=",")
+                next(reader) # always skip row 1 as header
+                for row in reader:
+                    try:
+                        new_field, created = Field.objects.get_or_create(name=row[0], dtype=row[1].upper(), template_id=tpk)
+                        if created:
+                            new_field.save()
+                    except Exception as e:
+                        messages.error(request, 'Can not parse row: {}. {}'.format(row, e))
+            else:
+                messages.error(request, 'Please submit a valid csv file')
+        # create and edit post method
+        else:
+            instance = get_object_or_404(Field, pk=pk) if pk else None
+            form = FieldForm(request.POST, instance=instance)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                obj.template_id = tpk
+                obj.save()
+"""
     html = TemplateResponse(request, 'porter/submit.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
