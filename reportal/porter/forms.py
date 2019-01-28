@@ -88,6 +88,6 @@ class SubmissionForm(forms.ModelForm):
         super(SubmissionForm, self).__init__(*args, **kwargs)
         self.fields['template'].queryset = Template.objects.filter(reports__id=rpk)
         self.fields['upload'].widget = forms.FileInput(attrs={'accept': ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
-        self.fields['upload'].help_text = 'csv/xlsx only'
+        self.fields['upload'].help_text = 'csv/xlsx, one sheet only'
         self.fields['upload'].validators = [FileExtensionValidator(allowed_extensions=['csv', 'xlsx'])]
         self.helper = form_horizontal()

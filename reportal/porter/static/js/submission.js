@@ -24,6 +24,8 @@ let table = $('#datatables').DataTable({
 });
 
 $('#new').on('click', function (e) {
+    $('#id_template').val('');
+    $('#id_upload').val('');
     $('#modal-form').attr('action', fp);
     $('#modal_title').text('NEW');
     $("#myModal").modal();

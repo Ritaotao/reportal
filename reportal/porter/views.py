@@ -244,7 +244,8 @@ def submissionIndex(request, rpk):
     if request.method == 'POST':
         if form.is_valid():
             # handle_uploaded_files(request.FILES['upload'], template_id)
-            check_quality(request.FILES['upload'], 1)
+            
+            check_quality(request, request.FILES['upload'], form.cleaned_data['template'])
             obj = form.save(commit=False)
             obj.report_id = rpk
             obj.uid = genUid()

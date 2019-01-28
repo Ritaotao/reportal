@@ -4,10 +4,8 @@ UPLOAD_METHODS = (
 )
 
 DATA_TYPES = (
-    ('INTEGER', 'Integer'),
-    ('FLOAT', 'Float'),
+    ('NUMERIC', 'Numeric'),
     ('STRING', 'String'),
-    ('DATE', 'Date'),
     ('DATETIME', 'Datetime')
 )
 

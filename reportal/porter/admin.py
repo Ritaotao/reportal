@@ -11,7 +11,11 @@ class ReportAdmin(admin.ModelAdmin):
     list_display=('id','name','method','report_set','last_modify_date','create_date','create_by')
 
 admin.site.register(Template)
-admin.site.register(Field)
+
+@admin.register(Field)
+class FieldAdmin(admin.ModelAdmin):
+    list_display=('id','template','name','dtype')
+
 
 @admin.register(Rule)
 class RuleAdmin(admin.ModelAdmin):
