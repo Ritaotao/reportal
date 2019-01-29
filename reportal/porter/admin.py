@@ -24,3 +24,7 @@ class RuleAdmin(admin.ModelAdmin):
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
     list_display=('id','report','template','uid','upload','submitted_date','submitted_by', 'is_clean')
+
+@admin.register(RuleSet)
+class RuleSetAdmin(admin.ModelAdmin):
+    list_display=('id','field','rule','action','argument','error_message')

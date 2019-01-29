@@ -34,3 +34,4 @@ $('#new').on('click', function (e) {
 $('#previous').on('click', function (e) {
     window.location = location.origin + '/list/';
 });
+

@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, StreamingHttpResponse
 from django.template.response import TemplateResponse
 from .models import ReportSet, Template, Submission, Field, RuleSet, Report
 from account.models import Group, Profile
@@ -243,46 +243,21 @@ def submissionIndex(request, rpk):
     form = SubmissionForm(rpk, request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            # handle_uploaded_files(request.FILES['upload'], template_id)
-            
-            check_quality(request, request.FILES['upload'], form.cleaned_data['template'])
-            obj = form.save(commit=False)
-            obj.report_id = rpk
-            obj.uid = genUid()
-            obj.submitted_by = request.user
-            obj.is_clean = False        
-            #obj.save()
+            #print(request.FILES['upload'])
+            cxt = check_quality(request, request.FILES['upload'], form.cleaned_data['template'])
+            if cxt:
+                response = HttpResponse(cxt['workbook'], content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = 'attachment; filename="quality_check.xlsx"'
+                return response
+            else:
+                obj = form.save(commit=False)
+                obj.report_id = rpk
+                obj.uid = genUid()
+                obj.submitted_by = request.user
+                obj.is_clean = False
+                obj.save()
         else:
             messages.error(request, 'Please submit a valid xlsx or csv file')
-    """  
-    form = FieldForm()
-    importform = FieldImportForm()
-    if request.method == 'POST':
-        # import post method
-        if 'btn_import' in request.POST:
-            importform = FieldImportForm(request.POST, request.FILES)
-            if importform.is_valid():
-                csvf = StringIO(request.FILES['docfile'].read().decode())
-                reader = csv.reader(csvf, delimiter=",")
-                next(reader) # always skip row 1 as header
-                for row in reader:
-                    try:
-                        new_field, created = Field.objects.get_or_create(name=row[0], dtype=row[1].upper(), template_id=tpk)
-                        if created:
-                            new_field.save()
-                    except Exception as e:
-                        messages.error(request, 'Can not parse row: {}. {}'.format(row, e))
-            else:
-                messages.error(request, 'Please submit a valid csv file')
-        # create and edit post method
-        else:
-            instance = get_object_or_404(Field, pk=pk) if pk else None
-            form = FieldForm(request.POST, instance=instance)
-            if form.is_valid():
-                obj = form.save(commit=False)
-                obj.template_id = tpk
-                obj.save()
-"""
     html = TemplateResponse(request, 'porter/submit.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
