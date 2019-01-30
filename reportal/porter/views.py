@@ -14,6 +14,7 @@ from .serializers import (ReportSetSerializer, TemplateSerializer, FieldSerializ
 
 import os
 from io import StringIO
+import pandas as pd
 import csv
 import random
 from .quality import check_quality
@@ -67,7 +68,6 @@ def templateIndex(request, rspk, pk=None):
         obj = form.save(commit=False)
         obj.report_set_id = rspk
         if not pk:
-            obj.uid = genUid()
             obj.create_by = request.user        
         obj.save()
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
@@ -81,7 +81,6 @@ def templateDuplicate(request, rspk, pk):
     template = get_object_or_404(Template, pk=pk)
     template.pk = None
     template.name = template.name + '_v2' # to avoid duplicate of reportset - template pair
-    template.uid = genUid()
     template.save()
     # save fields and rulesets
     fields = Field.objects.filter(template__id=pk).all()
@@ -246,16 +245,19 @@ def submissionIndex(request, rpk):
             #print(request.FILES['upload'])
             cxt = check_quality(request, request.FILES['upload'], form.cleaned_data['template'])
             if cxt:
-                response = HttpResponse(cxt['workbook'], content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                response['Content-Disposition'] = 'attachment; filename="quality_check.xlsx"'
-                return response
-            else:
                 obj = form.save(commit=False)
                 obj.report_id = rpk
-                obj.uid = genUid()
+                obj.name = request.FILES['upload'].name
                 obj.submitted_by = request.user
-                obj.is_clean = False
-                obj.save()
+                obj.is_clean = cxt['clean']
+                if cxt['clean'] == False:
+                    obj.upload.delete(save=False)
+                #response = HttpResponse(cxt['workbook'], content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                #response['Content-Disposition'] = 'attachment; filename="quality_check.xlsx"'
+                #return response
+                #obj.save()
+                request.session['analysis'] = cxt
+                return redirect('porter:result', rpk=rpk)
         else:
             messages.error(request, 'Please submit a valid xlsx or csv file')
     html = TemplateResponse(request, 'porter/submit.html', {'form': form, 'scope': scope})
@@ -274,3 +276,27 @@ class SubmissionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(report__id=report)
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(report__report_set__group__in=groups)
+
+def resultIndex(request, rpk):
+    '''
+        render form and form validation,
+    '''
+    scope = 'result'
+    df_meta, df_report = None, None
+    if 'analysis' in request.session:
+        cxt = request.session['analysis']
+        clean, df_meta, df_report = cxt['clean'], cxt['df_meta'], cxt['df_report']
+        #df_meta = pd.read_json(cxt['df_meta'], orient='records')
+        #df_meta = df_meta
+        #df_report = pd.read_json(cxt['df_report'], orient='records')
+        if clean == 'true':
+            messages.success(request, 'SUCCESS: Uploaded data passes all quality checks. Thank you!')
+        else:
+            messages.error(request, 'ERROR: Quality check for submission failed, please correct accordingly and resubmit')
+        #del request.session['analysis']
+    else:
+        messages.error(request, 'SYSTEM ERROR: No valid submission found')
+        return redirect('porter:submission', rpk=rpk)
+    # .to_html(table_id='df_meta')        .to_html(table_id='df_report')
+    html = TemplateResponse(request, 'porter/result.html', {'scope': scope, 'df_meta': df_meta, 'df_report': df_report})
+    return HttpResponse(html.render())

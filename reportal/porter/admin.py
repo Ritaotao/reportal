@@ -10,12 +10,13 @@ class ReportSetAdmin(admin.ModelAdmin):
 class ReportAdmin(admin.ModelAdmin):
     list_display=('id','name','method','report_set','last_modify_date','create_date','create_by')
 
-admin.site.register(Template)
+@admin.register(Template)
+class TemplateAdmin(admin.ModelAdmin):
+    list_display=('id','name','report_set','last_modify_date','create_date','create_by')
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
     list_display=('id','template','name','dtype')
-
 
 @admin.register(Rule)
 class RuleAdmin(admin.ModelAdmin):
@@ -23,7 +24,7 @@ class RuleAdmin(admin.ModelAdmin):
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display=('id','report','template','uid','upload','submitted_date','submitted_by', 'is_clean')
+    list_display=('id','report','template','name','upload','submitted_date','submitted_by', 'is_clean')
 
 @admin.register(RuleSet)
 class RuleSetAdmin(admin.ModelAdmin):

@@ -64,15 +64,16 @@ class Quality:
 
     def addMsg(self, name, rule_name, action, arg, err_msg, row_num):
         num_err = len(row_num)
+        row_num = ', '.join(str(x) for x in row_num)
         if num_err > 0:
             if action == 'ERROR':
-                self.err_msg.append('ERROR: {} values in Column <{}> failed {} check for {}: {}'.format(num_err, name, rule_name, arg, err_msg))
+                self.err_msg.append('ERROR: {} values in Column {} failed {} check for {}: {}'.format(num_err, name, rule_name, arg, err_msg))
                 self.err_detail.append(row_num)
             else:
-                self.wrn_msg.append('WARNING: {} values in Column <{}> failed {} check for {}: {}'.format(num_err, name, rule_name, arg, err_msg))
+                self.wrn_msg.append('WARNING: {} values in Column {} failed {} check for {}: {}'.format(num_err, name, rule_name, arg, err_msg))
                 self.wrn_detail.append(row_num)
         else:
-            self.scs_msg.append('SUCCESS: Column <{}> passed {} check for {}'.format(name, rule_name, arg))
+            self.scs_msg.append('SUCCESS: Column {} passed {} check for {}'.format(name, rule_name, arg))
 
     def _gte(self, rs_obj):
         # check value greater and equal than arg
@@ -129,7 +130,7 @@ def check_quality(request, input_file, template):
         ## error: column name missing
         field_diff = list(set([i['name'] for i in fields]) - set(df.columns))
         if field_diff:
-            messages.error(request, 'ERROR: Column <{}> missing, please check input file'.format(', '.join(field_diff)))
+            messages.error(request, 'ERROR: Column {} missing, please check input file'.format(', '.join(field_diff)))
             return cxt
     else:
         messages.error(request, 'SYSTEM ERROR: No field detected for requested template')
@@ -144,14 +145,15 @@ def check_quality(request, input_file, template):
             nan_idx = col.isnull() # NaN index in orginal column
             if dtype == 'NUMERIC':
                 if col.str.contains(r'\s|,|\$').sum() > 0:
-                    messages.warning(request, 'WARNING: Column <{}> contains space/comma/dollar'.format(name))
+                    messages.warning(request, 'WARNING: Column {} contains space/comma/dollar'.format(name))
                     col = col.str.replace(r'\s|,|\$', '')
                 col = pd.to_numeric(col.fillna(0), errors='coerce')
             else: # DATETIME
                 col = pd.to_datetime(col.fillna(0), errors='coerce')
             if col.isnull().sum() > 0:
                 row_num = list(col[col.isnull()].index+2) # idx and header: +2 to get excel row numbers
-                messages.error(request, 'ERROR: Column <{}> non {} rows: {}, please correct'.format(name, dtype.lower(), row_num))
+                row_num = ', '.join(str(x) for x in row_num)
+                messages.error(request, 'ERROR: Column {} non {} rows: {}, please correct'.format(name, dtype.lower(), row_num))
                 err_cnt += 1
             else: # to keep the original NaN values
                 col[nan_idx] = None
@@ -169,7 +171,6 @@ def check_quality(request, input_file, template):
         output = quality.output()
         # generate and output quality check report
         if output['err_msg']:
-            messages.error(request, 'ERROR: Quality check for submission failed, please correct accordingly and resubmit')
             df_err = pd.DataFrame({'message': output['err_msg'], 'row_number': output['err_detail']})
             df_err['level'] = 'ERROR'
             df_wrn = pd.DataFrame({'message': output['wrn_msg'], 'row_number': output['wrn_detail']})
@@ -177,27 +178,15 @@ def check_quality(request, input_file, template):
             df_scs = pd.DataFrame({'message': output['scs_msg']})
             df_scs['level'] = 'SUCCESS'
             df_report = pd.concat([df_err, df_wrn, df_scs], sort=False)
-
-            df_meta = df.describe(include='all').transpose()
-            df_meta['num_null'] = df.isnull().sum()
-            df_meta.rename(columns={'count': 'num_non_null'}, inplace=True)
-
-            ioutput = BytesIO()
-            writer = pd.ExcelWriter(ioutput, engine='xlsxwriter')
-            df_report.to_excel(writer, sheet_name='report', index=False)
-            df_meta.to_excel(writer, sheet_name='meta')
-            writer.save()
-            writer.close()
-
-            ioutput.seek(0)
-            cxt['workbook'] = ioutput.getvalue()
-        # show messages
-        for em in output['err_msg']:
-            messages.error(request, em)
-        for wm in output['wrn_msg']:
-            messages.warning(request, wm)
-        for sm in output['scs_msg']:
-            messages.success(request, sm)
+            cxt['df_report'] = df_report.to_json(orient='records')
+            cxt['clean'] = 'false'
+        else:
+            cxt['clean'] = 'ture'
+            cxt['df_report'] = pd.DataFrame().to_json(orient='records')
+        df_meta = df.describe(include='all').transpose()
+        df_meta['num_null'] = df.isnull().sum()
+        df_meta.reset_index(inplace=True)
+        cxt['df_meta'] = df_meta[['index', 'count', 'unique', 'top', 'freq', 'mean', 'std', 'min', 'max', 'num_null']].to_json(orient='records')
         return cxt
     else:
         messages.error(request, 'SYSTEM ERROR: No rule detected for requested template')

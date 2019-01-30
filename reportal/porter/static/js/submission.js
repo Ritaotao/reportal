@@ -15,7 +15,7 @@ let table = $('#datatables').DataTable({
     },
     "columns": [
         {"title": "id", "data": "id"},
-        {"title": "uid", "data": "uid"},
+        {"title": "name", "data": "name"},
         {"title": "template", "data": "template.name"},
         {"title": "submit_date", "data": "submitted_date"},
         {"title": "submit_by", "data": "submitted_by.username"},

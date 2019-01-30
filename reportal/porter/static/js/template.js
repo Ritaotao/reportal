@@ -23,7 +23,6 @@ let table = $('#datatables').DataTable({
     "columns": [
         {"title": "id", "data": "id"},
         {"title": "name", "data": "name"},
-        {"title": "uid", "data": "uid"},
         {"title": "create_date", "data": "create_date"},
         {"title": "create_by", "data": "create_by.username"},
         {"title": "last_modify_date", "data": "last_modify_date"},

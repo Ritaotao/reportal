@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h4>Meta Info</h4>
+<div>
+    <table id="df_meta" class="table table-hover"></table>
+</div>
+<h4>Submission Summary</h4>
+<div>
+    <table id="df_report" class="table table-hover"></table>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+
+
+    <!-- use scope variable from view to dynamically determine js file -->
+<script>
+    var json_meta = JSON.parse('{{ df_meta|escapejs }}');
+    var json_report = JSON.parse('{{ df_report|escapejs }}');
+
+    $('#df_meta').DataTable({
+        "data": json_meta,
+        "columns": [
+            {"title": "column", "data": "index"},
+            {"title": "num_non_null", "data": "count"},
+            {"title": "num_null", "data": "num_null"},
+            {"title": "unique", "data": "unique"},
+            {"title": "top", "data": "top"},
+            {"title": "freq", "data": "freq"},
+            {"title": "mean", "data": "mean"},
+            {"title": "std", "data": "std"},
+            {"title": "min", "data": "min"},
+            {"title": "max", "data": "max"},
+        ],
+    });
+
+    $('#df_report').DataTable({
+
+        "data": json_report,
+        "columns": [
+            {"title":"level", "data": "level"},
+            {"title":"message", "data": "message"},
+            {"title":"row_number", "data": "row_number"},
+        ],
+        columnDefs: [
+                {
+                    render: function (data, type, full, meta) {
+                        return "<div class='text-wrap width-200'>" + data + "</div>";
+                    },
+                    targets: [1]
+                },
+                {
+                    render: function (data, type, full, meta) {
+                        return "<div class='scrollable'>" + data + "</div>";
+                    },
+                    targets: [2]
+                },         
+        ]
+    });
+</script>
+
+
+{% endblock %}        
+<!--        "scrollY":        "400px",
+        "scrollX":  "100%",
+        "scrollCollapse": true,
+        "paging":         false,-->

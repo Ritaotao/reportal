@@ -23,7 +23,6 @@ class ReportSet(models.Model):
 
 class Template(models.Model):
     name = models.CharField(max_length=200)
-    uid = models.CharField(max_length=8, unique=True) # used to retrieve template
     report_set = models.ForeignKey(ReportSet, on_delete=models.CASCADE, related_name='templates')
     last_modify_date = models.DateTimeField(auto_now=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True, null=True)
@@ -91,7 +90,7 @@ def upload_directory_path(instance, filename):
 class Submission(models.Model):
     report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='submissions')
     template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name='submissions')
-    uid = models.CharField(max_length=8, unique=True) # used to download submissions
+    name = models.CharField(max_length=200)
     upload = models.FileField(upload_to=upload_directory_path, storage=private_storage, null=True)
     submitted_date = models.DateTimeField(auto_now=True, null=True)
     submitted_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, related_name='submissions')

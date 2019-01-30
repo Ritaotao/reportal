@@ -30,4 +30,5 @@ urlpatterns = [
     # submit url
     path('list/', views.listIndex, name='list'),
     path('submission/<int:rpk>/', views.submissionIndex, name='submission'),
+    path('submission/<int:rpk>/result', views.resultIndex, name='result')
 ]
