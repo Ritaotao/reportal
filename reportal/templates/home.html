@@ -2,30 +2,29 @@
 {% load staticfiles %}
 {% block content %}
 
-<div class="jumbotron">
-    <div class="container">
-      <h1 class="display-4">Welcome!</h1>
-      <p class="lead">Fasten your seat belt and choose a portal to enter from below</p>
-    </div>
-  </div>
 
-  <div class="container">
+    <h1 class="display-4">Welcome!</h1>
+    <p class="lead">Fasten your seat belt and choose a portal to enter from below</p>
+
+    <hr>
+
     <!-- Example row of columns -->
     <div class="card-deck mb-3">
       <div class="card mb-4 shadow-sm">
         <div class="card-header"><h4 class="my-0 font-weight-normal">Submit Portal</h4></div>
         <div class="card-body">
-            <p>Make file submissions for a specific report. Automatically examine data quality against pre-defined template. </p>
+            <p>Make file submissions or download submitted file, examined against pre-defined data quality template. </p>
             <a class="btn btn-lg btn-block btn-outline-primary" href="{% url 'porter:list' %}" role="button">Go submit</a>
         </div>
       </div>
+      <!--
       <div class="card mb-4 shadow-sm">
         <div class="card-header"><h4 class="my-0 font-weight-normal">Download Portal</h4></div>
         <div class="card-body">
             <p>Download files passed quality assurance step, or download templates to find instructions on how to fill data. </p>
             <button type="button" class="btn btn-lg btn-block btn-primary">Go download</button>
         </div>
-      </div>
+      </div>-->
       <div class="card mb-4 shadow-sm">
         <div class="card-header"><h4 class="my-0 font-weight-normal">Create Portal</h4></div>
         <div class="card-body">
@@ -37,5 +36,5 @@
 
     <hr>
 
-  </div> <!-- /container -->
+   <!-- /container -->
 {% endblock %}

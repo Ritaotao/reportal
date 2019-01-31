@@ -1,5 +1,5 @@
 let url_array = window.location.pathname.split('/');
-console.log(url_array);
+
 let spk = "";
 let pk = "";
 if (url_array.length == 5) {
@@ -8,7 +8,6 @@ if (url_array.length == 5) {
 } else {
     spk = url_array[url_array.length-2];
 }
-console.log(spk, pk);
 // query_param for drf, form_param for form
 let current = '/template/'
 let qp = "?report_set=" + spk;

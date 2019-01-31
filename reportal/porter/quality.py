@@ -186,7 +186,11 @@ def check_quality(request, input_file, template):
         df_meta = df.describe(include='all').transpose()
         df_meta['num_null'] = df.isnull().sum()
         df_meta.reset_index(inplace=True)
-        cxt['df_meta'] = df_meta[['index', 'count', 'unique', 'top', 'freq', 'mean', 'std', 'min', 'max', 'num_null']].to_json(orient='records')
+        meta_list = ['count', 'unique', 'top', 'freq', 'mean', 'std', 'min', 'max']
+        for i in meta_list:
+            if i not in df_meta.columns.values:
+                df_meta[i] = None
+        cxt['df_meta'] = df_meta[['index', 'num_null'] + meta_list].to_json(orient='records')
         return cxt
     else:
         messages.error(request, 'SYSTEM ERROR: No rule detected for requested template')

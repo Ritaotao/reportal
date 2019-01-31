@@ -3,6 +3,9 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+
+<div class="left"><a id="previous" href="#" class="previous">&laquo; Previous</a></div>
+
 <h4>Meta Info</h4>
 <div>
     <table id="df_meta" class="table table-hover"></table>
@@ -60,11 +63,14 @@
                 },         
         ]
     });
+
+    $('#previous').on('click', function (e) {
+        var url_array = window.location.pathname.split('/');
+        console.log(url_array[url_array.length-3])
+        window.location = window.origin + 'submission/' + url_array[url_array.length-3] + '/';
+    });
+
 </script>
 
 
-{% endblock %}        
-<!--        "scrollY":        "400px",
-        "scrollX":  "100%",
-        "scrollCollapse": true,
-        "paging":         false,-->
+{% endblock %}

@@ -6,7 +6,7 @@
 
     <div class="flex">
         <div class="left"><a id="previous" href="#" class="previous">&laquo; Previous</a></div>
-        {% if scope != 'list' %}
+        {% if scope == 'submission' %}
         <div class="right"><button type="button" data-dismiss="modal" class="btn btn-info btn-sm" id="new">+</button></div>
         {% endif %}
       </div>
@@ -14,7 +14,7 @@
     <!-- datatables, js renders thead and tbody-->
     <table id="datatables" class="table table-hover"></table>
 
-{% if scope != 'list' %}
+{% if scope == 'submission' %}
     {% include 'porter/editdelete_modal.html' %}
 {% endif %}
 

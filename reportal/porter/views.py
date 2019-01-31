@@ -242,21 +242,19 @@ def submissionIndex(request, rpk):
     form = SubmissionForm(rpk, request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            #print(request.FILES['upload'])
             cxt = check_quality(request, request.FILES['upload'], form.cleaned_data['template'])
             if cxt:
                 obj = form.save(commit=False)
                 obj.report_id = rpk
                 obj.name = request.FILES['upload'].name
                 obj.submitted_by = request.user
-                obj.is_clean = cxt['clean']
-                if cxt['clean'] == False:
+                if cxt['clean'] == 'false':
+                    obj.is_clean = False
                     obj.upload.delete(save=False)
-                #response = HttpResponse(cxt['workbook'], content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                #response['Content-Disposition'] = 'attachment; filename="quality_check.xlsx"'
-                #return response
-                #obj.save()
+                else:
+                    obj.is_clean = True
                 request.session['analysis'] = cxt
+                obj.save()
                 return redirect('porter:result', rpk=rpk)
         else:
             messages.error(request, 'Please submit a valid xlsx or csv file')
@@ -272,31 +270,44 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Submission.objects.all()
         report = self.request.query_params.get('report', None)
+        clean = self.request.query_params.get('is_clean', None)
         if report is not None:
             queryset = queryset.filter(report__id=report)
+        if clean is not None:
+            queryset = queryset.filter(is_clean=True)
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(report__report_set__group__in=groups)
 
 def resultIndex(request, rpk):
     '''
-        render form and form validation,
+        render 2 json to template and use datatables to format
     '''
     scope = 'result'
     df_meta, df_report = None, None
     if 'analysis' in request.session:
         cxt = request.session['analysis']
         clean, df_meta, df_report = cxt['clean'], cxt['df_meta'], cxt['df_report']
-        #df_meta = pd.read_json(cxt['df_meta'], orient='records')
-        #df_meta = df_meta
-        #df_report = pd.read_json(cxt['df_report'], orient='records')
         if clean == 'true':
             messages.success(request, 'SUCCESS: Uploaded data passes all quality checks. Thank you!')
-        else:
+        elif clean == 'false':
             messages.error(request, 'ERROR: Quality check for submission failed, please correct accordingly and resubmit')
-        #del request.session['analysis']
+        del request.session['analysis']
     else:
         messages.error(request, 'SYSTEM ERROR: No valid submission found')
         return redirect('porter:submission', rpk=rpk)
-    # .to_html(table_id='df_meta')        .to_html(table_id='df_report')
     html = TemplateResponse(request, 'porter/result.html', {'scope': scope, 'df_meta': df_meta, 'df_report': df_report})
+    return HttpResponse(html.render())
+
+def downloadIndex(request, rpk):
+    '''
+        render form and form validation,
+        submission.js controls form action and adds parameters to url
+    '''
+    scope = 'download'
+
+    #response = HttpResponse(cxt['workbook'], content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    #response['Content-Disposition'] = 'attachment; filename="quality_check.xlsx"'
+    #return response
+    #obj.save()
+    html = TemplateResponse(request, 'porter/submit.html', {'scope': scope})
     return HttpResponse(html.render())

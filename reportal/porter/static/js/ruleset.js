@@ -1,5 +1,5 @@
 let url_array = window.location.pathname.split('/');
-console.log(url_array);
+
 let rspk = '';
 let spk = '';
 let pk = '';
@@ -12,7 +12,6 @@ if (url_array.length == 6) {
     spk = url_array[url_array.length-2];
 }
 
-console.log(spk, pk);
 // query_param for drf, form_param for form
 let current = '/ruleset/'
 let qp = '?template=' + spk;
@@ -48,16 +47,10 @@ let table = $('#datatables').DataTable({
     "columnDefs": [
         // hide ID columns
         {
-            "targets": [ 6 ],
+            "targets": [ 6, 7 ],
             "visible": false,
             "searchable": false
-        },
-        {
-            
-            "targets": [ 7 ],
-            "visible": false,
-            "searchable": false
-        }     
+        },    
     ]
 });
 

@@ -15,18 +15,33 @@ let table = $('#datatables').DataTable({
         {"title": "create_date", "data": "create_date"},
         {"title": "create_by", "data": "create_by.username"},
         {"title": "last_modify_date", "data": "last_modify_date"},
-        {
+        {        
             "title": "option", 
             "data": null,
-            "defaultContent": '<button class="btn btn-info btn-sm" id="btn-go">Go</button>'
+            "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
+            '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
+            '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
+            '<a class="dropdown-item" id="btn-submit" href="#">Submit</a>' + 
+            '<a class="dropdown-item" id="btn-download" href="#">Download</a>' + 
+            '</div></div>'
         }
     ],
 });
 
-$('#datatables tbody').on('click', 'button', function () {
+let id = 0;
+
+$('#datatables tbody').on('click', 'a', function () {
     let data = table.row($(this).parents('tr')).data();
-    // GO button
-    window.location = location.origin + '/submission/' + data['id'] + '/'; 
+    id = data['id'];
+
+    let id_name = $(this).attr("id");
+    if (id_name == 'btn-submit') {
+        // Go to Submit page for that report
+        window.location = location.origin + '/submission/' + id + '/'; 
+    } else if (id_name == 'btn-download') {
+        // DUPLICATE button
+        window.location = location.origin + '/download/' + id + '/'; 
+    }
 });
 
 
