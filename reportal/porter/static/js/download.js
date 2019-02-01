@@ -15,12 +15,27 @@ let table = $('#datatables').DataTable({
     },
     "columns": [
         {"title": "id", "data": "id"},
-        {"title": "upload", "data": "upload"},
         {"title": "template", "data": "template.name"},
+        {"title": "file", "data": "name"},
         {"title": "submit_date", "data": "submitted_date"},
         {"title": "submit_by", "data": "submitted_by.username"},
-        {"title": "clean", "data": "is_clean"},
+        {
+            "title": "option", 
+            "data": null,
+            "defaultContent": '<button class="btn btn-info btn-sm" type="button" id="btn-download">Download</button>'
+        },
     ],
+});
+
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    id = data['id'];
+
+    let id_name = $(this).attr("id");
+    if (id_name == 'btn-download') {
+        // Download button
+        window.location = location.origin + '/download/' + rpk + '/' + id + '/'; 
+    }
 });
 
 $('#previous').on('click', function (e) {

@@ -298,16 +298,22 @@ def resultIndex(request, rpk):
     html = TemplateResponse(request, 'porter/result.html', {'scope': scope, 'df_meta': df_meta, 'df_report': df_report})
     return HttpResponse(html.render())
 
-def downloadIndex(request, rpk):
+def downloadIndex(request, rpk, pk=None):
     '''
         render form and form validation,
         submission.js controls form action and adds parameters to url
     '''
     scope = 'download'
 
-    #response = HttpResponse(cxt['workbook'], content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    #response['Content-Disposition'] = 'attachment; filename="quality_check.xlsx"'
-    #return response
-    #obj.save()
+    if pk:
+        download_file = get_object_or_404(Submission, pk=pk)
+        filename = os.path.basename(download_file.upload.name)
+        if '.xlsx' in filename:
+            cnt_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        elif '.csv' in filename:
+            cnt_type = 'text/csv'
+        response = HttpResponse(download_file.upload, content_type=cnt_type)
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        return response
     html = TemplateResponse(request, 'porter/submit.html', {'scope': scope})
     return HttpResponse(html.render())

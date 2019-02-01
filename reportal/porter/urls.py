@@ -32,4 +32,5 @@ urlpatterns = [
     path('submission/<int:rpk>/', views.submissionIndex, name='submission'),
     path('submission/<int:rpk>/result/', views.resultIndex, name='result'),
     path('download/<int:rpk>/', views.downloadIndex, name='download'),
+    path('download/<int:rpk>/<int:pk>/', views.downloadIndex, name='download_file'),
 ]
