@@ -22,7 +22,7 @@ let table = $('#datatables').DataTable({
         {
             "title": "option", 
             "data": null,
-            "defaultContent": '<button class="btn btn-info btn-sm" type="button" id="btn-download">Download</button>'
+            "defaultContent": '<button class="btn btn-info btn-sm" type="button" id="btn-download"><span class="fa fa-download"></span> Download</button>'
         },
     ],
 });

@@ -1,5 +1,5 @@
 let url_array = window.location.pathname.split('/');
-console.log(url_array);
+
 let spk = "";
 let pk = "";
 if (url_array.length == 5) {
@@ -9,7 +9,6 @@ if (url_array.length == 5) {
     spk = url_array[url_array.length-2];
 }
 
-console.log(spk, pk);
 // query_param for drf, form_param for form
 let current = '/report/'
 let qp = "?report_set=" + spk;
@@ -34,11 +33,11 @@ let table = $('#datatables').DataTable({
             "title": "option", 
             "data": null,
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
-            '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
+            '<button class="btn btn-md dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-edit"></span></button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-dup" href="#">Duplicate</a>' + 
-            '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
-            '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
+            '<a class="dropdown-item" id="btn-edit" href="#"><span class="fa fa-pencil"></span> Edit</a>' + 
+            '<a class="dropdown-item" id="btn-dup" href="#"><span class="fa fa-copy"></span> Duplicate</a>' + 
+            '<a class="dropdown-item" id="btn-delete"href="#"><span class="fa fa-trash-o"></span> Delete</a>' +
             '</div></div>'
         }
     ],
@@ -61,7 +60,6 @@ $('#datatables tbody').on('click', 'a', function () {
     let id_name = $(this).attr("id");
     if (id_name == 'btn-delete') {
         // DELETE button
-        $('#modal_title').text('DELETE');
         $('#confirm').modal();
     } else {
         // get template ids for manytomany field
@@ -77,10 +75,12 @@ $('#datatables tbody').on('click', 'a', function () {
             // edit: bind pk to url
             $('#id_name').val(data['name']);
             $('#modal-form').attr('action', fp + id + '/');
+            $('#modal_title').text('EDIT');
             $('#myModal').modal();
         } else {
             // duplicate: submit form without id
-            $('#id_name').val(data['name']+'_2');
+            var dt = new Date().getTime();
+            $('#id_name').val(data['name'] + '_' + dt);
             $('#modal-form').attr('action', fp);
             $('#modal-form').submit();
         }

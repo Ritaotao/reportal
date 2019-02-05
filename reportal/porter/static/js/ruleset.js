@@ -36,11 +36,11 @@ let table = $('#datatables').DataTable({
             "title": "option", 
             "data": null,
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
-            '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
+            '<button class="btn btn-md dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-edit"></span></button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-edit" href="#">Edit</a>' + 
-            '<a class="dropdown-item" id="btn-duplicate" href="#">Duplicate</a>' + 
-            '<a class="dropdown-item" id="btn-delete"href="#">Delete</a>' +
+            '<a class="dropdown-item" id="btn-edit" href="#"><span class="fa fa-pencil"></span> Edit</a>' + 
+            '<a class="dropdown-item" id="btn-duplicate" href="#"><span class="fa fa-copy"></span> Duplicate</a>' + 
+            '<a class="dropdown-item" id="btn-delete"href="#"><span class="fa fa-trash-o"></span> Delete</a>' +
             '</div></div>'
         }
     ],
@@ -70,6 +70,7 @@ $('#datatables tbody').on('click', 'a', function () {
         $('#id_error_message').val(data['error_message']);
         // bind item id to url
         $('#modal-form').attr('action', fp + id + '/');
+        $('#modal_title').text('EDIT');
         $('#myModal').modal();
     } else if (id_name == 'btn-duplicate') {
         // DUPLICATE button
@@ -82,9 +83,9 @@ $('#datatables tbody').on('click', 'a', function () {
         $('#modal-form').attr('action', fp);
         $('#modal-form').submit();        
     } else {
-    // DELETE button
-    $('#modal_title').text('DELETE');
-    $('#confirm').modal();
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $('#confirm').modal();
     }
 });
 

@@ -19,10 +19,10 @@ let table = $('#datatables').DataTable({
             "title": "option", 
             "data": null,
             "defaultContent": '<div class="btn-group dropright" id="btn-dropdown">' + 
-            '<button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>' + 
+            '<button class="btn btn-md dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-edit"></span></button>' + 
             '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' + 
-            '<a class="dropdown-item" id="btn-submit" href="#">Submit</a>' + 
-            '<a class="dropdown-item" id="btn-download" href="#">Download</a>' + 
+            '<a class="dropdown-item" id="btn-submit" href="#"><span class="fa fa-save"></span> Submit</a>' + 
+            '<a class="dropdown-item" id="btn-download" href="#"><span class="fa fa-download"></span> Download</a>' + 
             '</div></div>'
         }
     ],

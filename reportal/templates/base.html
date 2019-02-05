@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
    
@@ -75,13 +76,19 @@
         padding: 0;
         overflow: auto;        
       }
+      .white-icon {
+        color: white;
+      }
+      .red-icon {
+        color: red;
+      }
 </style>
     <!-- Custom styles for this template -->
     <!-- <link href="starter-template.css" rel="stylesheet"> -->
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="/">PHD MS</a>
+    <a class="navbar-brand" href="/">Reportal</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -97,35 +104,24 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'porter:reportset' %}">Create</a>
         </li>
-        {% if user.is_staff %}
-          <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin</a>
-              <div class="dropdown-menu" aria-labelledby="dropdown02">
-                <a class="dropdown-item" href="#">Developer Logs</a>
-                <a class="dropdown-item" href="/admin">Admin Portal</a>
-              </div>
-          </li>
-        {% endif %}
-        </ul>
-        <ul class="navbar-nav navbar-right">
-          {% if user.is_authenticated %}
-            <li class="nav-item"><span class="navbar-text">Welcome, </span></li>         
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><strong>{{request.user.username}}</strong></a>
-                <div class="dropdown-menu" aria-labelledby="dropdown03">
-                  <a class="dropdown-item" href="{% url 'account:profile' %}">Account</a>
-                  <a class="dropdown-item" href="{% url 'account:logout' %}">Sign Out</a>
-                </div>
-            </li>     
-          {% else %}
-          <form class='form-inline' method='POST' action="{% url 'account:signin' %}">
-              {% csrf_token %}
-                  <input type='text' class='form-control mr-sm-2' name='username' placeholder='Username' />
-                  <input type='password' class='form-control mr-sm-2' name='password' placeholder='Password' />
-                  <button type='submit' class='btn btn-default'>Sign in</button>
-          </form>
-            <li class="nav-item"><a class="nav-link" href="{% url 'account:signup' %}"><strong>Register</strong></a></li>
-          {% endif %}             
+      </ul>
+      <ul class="navbar-nav navbar-right">
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'account:profile' %}">Welcome, <strong>{{request.user.username}}</strong> <span class="fa fa-user"></span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'account:logout' %}">Signout</a>
+        </li>
+        {% else %}
+        <form class='form-inline' method='POST' action="{% url 'account:signin' %}">
+            {% csrf_token %}
+                <input type='text' class='form-control mr-sm-2' name='username' placeholder='Username' />
+                <input type='password' class='form-control mr-sm-2' name='password' placeholder='Password' />
+                <button type='submit' class='btn btn-default'>Sign in</button>
+        </form>
+          <li class="nav-item"><a class="nav-link" href="{% url 'account:signup' %}"><strong>Register</strong></a></li>
+        {% endif %}             
 
       </ul>
     </div>

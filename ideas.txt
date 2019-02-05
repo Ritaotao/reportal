@@ -1,0 +1,5 @@
+1. README.md needed.
+2. User access control: view, create, edit, delete.
+3. Link submission to Google Drive instead of local.
+4. Upload progress bar, also current uploading is very slow.
+5. Ideas for more QA rules.

@@ -2,34 +2,26 @@
 {% load staticfiles %}
 {% block content %}
 
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h4 class="display-4">Welcome!</h4>
+  <p>Reportal helps detact data descrepancies in excel files, with a goal to create awareness for importance of good data quality.</p>
+</div>
 
-    <h1 class="display-4">Welcome!</h1>
-    <p class="lead">Fasten your seat belt and choose a portal to enter from below</p>
-
-    <hr>
 
     <!-- Example row of columns -->
     <div class="card-deck mb-3">
       <div class="card mb-4 shadow-sm">
         <div class="card-header"><h4 class="my-0 font-weight-normal">Submit Portal</h4></div>
         <div class="card-body">
-            <p>Make file submissions or download submitted file, examined against pre-defined data quality template. </p>
-            <a class="btn btn-lg btn-block btn-outline-primary" href="{% url 'porter:list' %}" role="button">Go submit</a>
+            <p>Submit or download excel files, examined against pre-defined data quality template and rules.</p>
+            <div style="text-align: center;"><a class="btn btn-lg btn-outline-primary" href="{% url 'porter:list' %}" role="button"><span class="fa fa-paw"></span> Go submit</a></div>
         </div>
       </div>
-      <!--
-      <div class="card mb-4 shadow-sm">
-        <div class="card-header"><h4 class="my-0 font-weight-normal">Download Portal</h4></div>
-        <div class="card-body">
-            <p>Download files passed quality assurance step, or download templates to find instructions on how to fill data. </p>
-            <button type="button" class="btn btn-lg btn-block btn-primary">Go download</button>
-        </div>
-      </div>-->
       <div class="card mb-4 shadow-sm">
         <div class="card-header"><h4 class="my-0 font-weight-normal">Create Portal</h4></div>
         <div class="card-body">
-            <p>Create new reports or templates, make changes to existing templates, and add new templates to report sets. </p>
-            <a class="btn btn-lg btn-block btn-primary" href="{% url 'porter:reportset' %}" role="button">Go create</a>
+            <p>Create or edit data quality templates, attach templates to reports and report sets.</p>
+            <div style="text-align: center;"><a class="btn btn-lg btn-primary" href="{% url 'porter:reportset' %}" role="button"><span class="fa fa-laptop"></span> Go create</a></div>
         </div>
       </div>
     </div>

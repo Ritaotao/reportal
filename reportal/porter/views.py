@@ -6,6 +6,7 @@ from account.models import Group, Profile
 from .forms import ReportSetForm, TemplateForm, FieldForm, FieldImportForm, RuleSetForm, ReportForm, SubmissionForm
 from django.contrib import messages
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from rest_framework import viewsets
 # from rest_framework.permissions import IsAuthenticated
@@ -19,22 +20,11 @@ import csv
 import random
 from .quality import check_quality
 
-# utility functions
-def genUid():
-    rand = str(random.randint(100,999)) + '-' + str(random.randint(1000,9999))
-    if Submission.objects.filter(uid = rand).exists() or Template.objects.filter(uid = rand).exists():
-        genUid()
-    else:
-        return rand
-
 # Create your views here.
 # create portal
-
+@login_required(login_url='/account/signin/')
 def reportsetIndex(request, pk=None):
-    '''
-        render form and form validation,
-        reportset.js controls form action and adds parameters to url
-    '''
+    '''Reportset organizes both Templates and Reports, under a Group/Account'''
     scope = 'reportset'
     instance = get_object_or_404(ReportSet, pk=pk) if pk else None
     form = ReportSetForm(request.user, request.POST or None, instance=instance)
@@ -56,11 +46,9 @@ class ReportSetViewSet(viewsets.ModelViewSet):
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return ReportSet.objects.filter(group__in=groups)
 
+@login_required(login_url='/account/signin/')
 def templateIndex(request, rspk, pk=None):
-    '''
-        render form and form validation,
-        template.js controls form action and adds parameters to url
-    '''
+    '''Template organizes Fields and Rulesets, under a Reportset'''
     scope = 'template'
     instance = get_object_or_404(Template, pk=pk) if pk else None
     form = TemplateForm(request.POST or None, instance=instance)
@@ -73,10 +61,9 @@ def templateIndex(request, rspk, pk=None):
     html = TemplateResponse(request, 'porter/create.html', {'form': form, 'scope': scope})
     return HttpResponse(html.render())
 
+@login_required(login_url='/account/signin/')
 def templateDuplicate(request, rspk, pk):
-    '''
-        Duplicate template and nested fields and rulesets
-    '''
+    '''Duplicate template and nested fields and rulesets'''
     # save template
     template = get_object_or_404(Template, pk=pk)
     template.pk = None
@@ -95,7 +82,6 @@ def templateDuplicate(request, rspk, pk):
             ruleset.save()
     return redirect("porter:template", rspk=rspk)
 
-
 class TemplateViewSet(viewsets.ModelViewSet):
     '''
         drf to datatable, filter qs
@@ -110,11 +96,9 @@ class TemplateViewSet(viewsets.ModelViewSet):
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(report_set__group__in=groups)
 
+@login_required(login_url='/account/signin/')
 def fieldIndex(request, rspk, tpk, pk=None):
-    '''
-        render form and form validation,
-        field.js controls form action and adds parameters to url
-    '''
+    '''Field defines column name and column datatypes, under a Template'''
     scope = 'field'
     form = FieldForm()
     importform = FieldImportForm()
@@ -163,11 +147,9 @@ class FieldViewSet(viewsets.ModelViewSet):
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(template__report_set__group__in=groups)
 
+@login_required(login_url='/account/signin/')
 def rulesetIndex(request, rspk, tpk, pk=None):
-    '''
-        render form and form validation,
-        ruleset.js controls form action and adds parameters to url
-    '''   
+    '''Ruleset combines Field and Rule, define the list of qa process, under a Template'''   
     scope = 'ruleset'
     instance = get_object_or_404(RuleSet, pk=pk) if pk else None
     form = RuleSetForm(tpk, request.POST or None, instance=instance)
@@ -191,11 +173,9 @@ class RuleSetViewSet(viewsets.ModelViewSet):
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(field__template__report_set__group__in=groups)
 
+@login_required(login_url='/account/signin/')
 def reportIndex(request, rspk, pk=None):
-    '''
-        render form and form validation,
-        report.js controls form action and adds parameters to url
-    '''
+    '''Report defines the set of templates to be QA'ed against'''
     scope = 'report'
     instance = get_object_or_404(Report, pk=pk) if pk else None
     form = ReportForm(rspk, request.POST or None, instance=instance)
@@ -224,20 +204,16 @@ class ReportViewSet(viewsets.ModelViewSet):
         return queryset.filter(report_set__group__in=groups)
 
 # submit portal
+@login_required(login_url='/account/signin/')
 def listIndex(request):
-    '''
-        render form and form validation,
-        list.js show reportViewSet list for data table
-    '''
+    '''List reports available to user for submit/download'''
     scope = 'list'
     html = TemplateResponse(request, 'porter/submit.html', {'scope': scope})
     return HttpResponse(html.render())
 
+@login_required(login_url='/account/signin/')
 def submissionIndex(request, rpk):
-    '''
-        render form and form validation,
-        submission.js controls form action and adds parameters to url
-    '''
+    '''Make a new Submission for Report/Template selected'''
     scope = 'submission'
     form = SubmissionForm(rpk, request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -278,10 +254,9 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         groups = Profile.objects.get(user=self.request.user).groups.all()
         return queryset.filter(report__report_set__group__in=groups)
 
+@login_required(login_url='/account/signin/')
 def resultIndex(request, rpk):
-    '''
-        render 2 json to template and use datatables to format
-    '''
+    '''Result page showing analysis of data quality'''
     scope = 'result'
     df_meta, df_report = None, None
     if 'analysis' in request.session:
@@ -298,11 +273,9 @@ def resultIndex(request, rpk):
     html = TemplateResponse(request, 'porter/result.html', {'scope': scope, 'df_meta': df_meta, 'df_report': df_report})
     return HttpResponse(html.render())
 
+@login_required(login_url='/account/signin/')
 def downloadIndex(request, rpk, pk=None):
-    '''
-        render form and form validation,
-        submission.js controls form action and adds parameters to url
-    '''
+    '''Download submitted files that pass data quality check'''
     scope = 'download'
 
     if pk:
